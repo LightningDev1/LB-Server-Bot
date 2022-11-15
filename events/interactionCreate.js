@@ -58,7 +58,7 @@ client.on("interactionCreate", async(interaction) => {
               Type: interaction.customId,
               Claimed: false,
             })
-            if(interaction.customId == "purchase") interaction.customId = "Purchase
+            if(interaction.customId == "purchase") interaction.customId = "Purchase"
             if(interaction.customId == "support") interaction.customId = "Support"
             if(interaction.customId == "report") interaction.customId = "Report"
             const embed = new MessageEmbed()
