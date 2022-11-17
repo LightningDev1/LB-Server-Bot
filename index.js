@@ -12,6 +12,10 @@ const client = new Client({ intents: 32767 });
 client.commands = new Collection();
 client.slashCommands = new Collection();
 
+process.on("unhandledRejection", (err) => {
+  console.log(err);
+});
+
 (async () => {
   // Connect to the MongoDB database
   try {
@@ -40,7 +44,7 @@ client.slashCommands = new Collection();
 
   for (let filePath of slashCommandFiles) {
     filePath = filePath.replace(cwd, ".");
-    let command = await import(filePath);
+    let command = (await import(filePath)).default;
 
     if (!command?.name) return;
 

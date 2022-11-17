@@ -44,9 +44,9 @@ async function handleButtonPress(interaction) {
       }
 
       const transcriptAttachment = await createTranscript(interaction.channel, {
-        limit: -1,
-        returnBuffer: false,
+        returnType: "attachment",
         fileName: `${interaction.channel.name}.html`,
+        minify: true,
       });
 
       // Update the database entry
@@ -107,7 +107,6 @@ async function handleButtonPress(interaction) {
           if (err) throw err;
         });
       }, 10 * 1000);
-      break;
 
     case "claim":
       if (ticket.Claimed) {
@@ -139,17 +138,21 @@ client.on("interactionCreate", async (interaction) => {
   // Slash Command Handling
   if (interaction.isCommand()) {
     const cmd = client.slashCommands.get(interaction.commandName);
-    if (!cmd) return interaction.reply({ content: "An error has occurred " });
+    if (!cmd) return interaction.reply({ content: "An error has occurred" });
 
-    const args = [];
+    const args = {};
     for (let option of interaction.options.data) {
-      if (option.type === "SUB_COMMAND") {
-        if (option.name) args.push(option.name);
-        option.options.forEach((x) => {
-          if (x.value) args.push(x.value);
-        });
-      } else if (option.value) args.push(option.value);
+      switch (option.type) {
+        case "SUB_COMMAND":
+          args.subCommand = option.name;
+          args.options = option.options;
+          break;
+        default:
+          args[option.name] = option.value;
+          break;
+      }
     }
+    
     interaction.member = interaction.guild.members.cache.get(
       interaction.user.id
     );
@@ -167,7 +170,7 @@ client.on("interactionCreate", async (interaction) => {
   if (interaction.isButton()) {
     await interaction.deferUpdate();
 
-    await ahandleButtonPress(interaction);
+    await handleButtonPress(interaction);
   }
 
   // Select Menu Handling

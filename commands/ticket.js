@@ -1,68 +1,22 @@
 import { MessageEmbed, MessageActionRow, MessageSelectMenu } from "discord.js";
 import ticketDB from "../models/ticket.js";
 
-export const name = "ticket";
-export const description = "Ticket";
-export const type = "CHAT_INPUT";
-export const userPermissions = ["ADMINISTRATOR"];
-export const defaultPermission = false;
-export const options = [
-  {
-    name: "setup",
-    description: "Setup the ticket system",
-    type: "SUB_COMMAND",
-    options: [
-      {
-        name: "channel",
-        description: "Channel where the ticket system will be created",
-        type: "CHANNEL",
-        required: true,
-        channelTypes: ["GUILD_TEXT"],
-      },
-    ],
-  },
-  {
-    name: "action",
-    description: "Action on a ticket",
-    type: "SUB_COMMAND",
-    options: [
-      {
-        name: "type",
-        type: "STRING",
-        description: "Add or Remove a user from this ticket",
-        required: true,
-        choices: [
-          {
-            name: "Add",
-            value: "add",
-          },
-          {
-            name: "Remove",
-            value: "remove",
-          },
-        ],
-      },
-      {
-        name: "user",
-        type: "USER",
-        description: "The user to add or remove",
-        required: true,
-      },
-    ],
-  },
-];
+const subCommands = ["setup", "action"];
 
-export async function run(client, interaction, args) {
-  await interaction.deferReply({ ephemeral: true });
+async function run(client, interaction, args) {
+  console.log("run args: ", args);
 
-  const [SubCommand] = args;
+  if (!subCommands.includes(args.subCommand)) {
+    return;
+  }
 
-  if (!interaction.member.permissions.has("ADMINISTRATOR"))
+  if (!interaction.member.permissions.has("ADMINISTRATOR")) {
     return interaction.followUp({
       content: "You must be an administrator to use this command",
     });
+  }
 
-  if (SubCommand == "setup") {
+  if (args.subCommand == "setup") {
     const ticketChannel = interaction.options.getChannel("channel");
 
     const embed = new MessageEmbed()
@@ -109,89 +63,140 @@ export async function run(client, interaction, args) {
       ],
       ephemeral: true,
     });
-  } else if (SubCommand == "action") {
+  } else if (args.subCommand == "action") {
     const action = interaction.options.getString("action");
     const user = interaction.options.getUser("user");
 
+    const ticket = ticketDB.findOne({
+      GuildID: interaction.guild.id,
+      ChannelID: interaction.channel.id,
+    });
+
+    if (!ticket) {
+      return interaction.reply({
+        content: "This channel is not a ticket!",
+        ephemeral: true,
+      });
+    }
+
     switch (action) {
       case "add":
-        ticketDB.findOne(
-          { GuildID: interaction.guild.id, ChannelID: interaction.channel.id },
-          async (err, docs) => {
-            if (err) throw err;
-            if (!docs)
-              return interaction.reply({
-                content: "This channel is not a ticket",
-                ephemeral: true,
-              });
-            if (interaction.user.id == user.id)
-              return interaction.reply({
-                content: "You can't add yourself to a ticket",
-                ephemeral: true,
-              });
-            if (docs.Users.includes(user.id))
-              return interaction.reply({
-                content: "This user is already in this ticket",
-                ephemeral: true,
-              });
-            docs.Users.push(user.id);
+        if (interaction.user.id == user.id) {
+          return interaction.reply({
+            content: "You can't add yourself to a ticket",
+            ephemeral: true,
+          });
+        }
 
-            interaction.channel.permissionOverwrites.edit(user.id, {
-              SEND_MESSAGES: true,
-              VIEW_CHANNEL: true,
-              READ_MESSAGE_HISTORY: true,
-            });
+        if (ticket.Users.includes(user.id)) {
+          return interaction.reply({
+            content: "This user is already in this ticket",
+            ephemeral: true,
+          });
+        }
 
-            interaction.reply({
-              content: `${user.tag} has been added to this ticket`,
-              ephemeral: true,
-            });
-            interaction.channel.send(
-              `Hey ${user} you have been added to this ticket`
-            );
-            docs.save();
-          }
+        ticket.Users.push(user.id);
+
+        interaction.channel.permissionOverwrites.edit(user.id, {
+          SEND_MESSAGES: true,
+          VIEW_CHANNEL: true,
+          READ_MESSAGE_HISTORY: true,
+        });
+
+        interaction.reply({
+          content: `${user.tag} has been added to this ticket`,
+          ephemeral: true,
+        });
+        interaction.channel.send(
+          `Hey ${user} you have been added to this ticket`
         );
+        ticket.save();
         break;
+
       case "remove":
-        findOne(
-          { GuildID: interaction.guild.id, ChannelID: interaction.channel.id },
-          async (err, docs) => {
-            if (err) throw err;
-            if (!docs)
-              return interaction.reply({
-                content: "This channel is not a ticket",
-                ephemeral: true,
-              });
-            if (interaction.user.id == user.id)
-              return interaction.reply({
-                content: "You can't remove yourself from a ticket",
-                ephemeral: true,
-              });
-            if (!docs.Users.includes(user.id))
-              return interaction.reply({
-                content: "This user is not in this ticket",
-                ephemeral: true,
-              });
-            docs.Users.remove(user.id);
+        if (interaction.user.id == user.id) {
+          return interaction.reply({
+            content: "You can't remove yourself from a ticket",
+            ephemeral: true,
+          });
+        }
 
-            interaction.channel.permissionOverwrites.edit(user.id, {
-              SEND_MESSAGES: false,
-              VIEW_CHANNEL: false,
-              READ_MESSAGE_HISTORY: false,
-            });
+        if (!ticket.Users.includes(user.id)) {
+          return interaction.reply({
+            content: "This user is not in this ticket",
+            ephemeral: true,
+          });
+        }
 
-            interaction.reply({
-              content: `${user.tag} has been removed from this ticket`,
-              ephemeral: true,
-            });
-            interaction.channel.send(
-              `${user} has been removed from this ticket`
-            );
-            docs.save();
-          }
-        );
+        ticket.Users.remove(user.id);
+
+        interaction.channel.permissionOverwrites.edit(user.id, {
+          SEND_MESSAGES: false,
+          VIEW_CHANNEL: false,
+          READ_MESSAGE_HISTORY: false,
+        });
+
+        interaction.reply({
+          content: `${user.tag} has been removed from this ticket`,
+          ephemeral: true,
+        });
+        interaction.channel.send(`${user} has been removed from this ticket`);
+        ticket.save();
         break;
     }
   }
 }
+
+export default {
+  name: "ticket",
+  description: "Ticket System",
+  type: "CHAT_INPUT",
+  userPermissions: ["ADMINISTRATOR"],
+  defaultPermission: true,
+  options: [
+    {
+      name: "setup",
+      description: "Setup the ticket system",
+      type: "SUB_COMMAND",
+      options: [
+        {
+          name: "channel",
+          description: "Channel where the ticket system will be created",
+          type: "CHANNEL",
+          required: true,
+          channelTypes: ["GUILD_TEXT"],
+        },
+      ],
+    },
+    {
+      name: "action",
+      description: "Action on a ticket",
+      type: "SUB_COMMAND",
+      options: [
+        {
+          name: "action",
+          type: "STRING",
+          description: "Add or Remove a user from this ticket",
+          required: true,
+          choices: [
+            {
+              name: "Add",
+              value: "add",
+            },
+            {
+              name: "Remove",
+              value: "remove",
+            },
+          ],
+        },
+        {
+          name: "user",
+          type: "USER",
+          description: "The user to add or remove",
+          required: true,
+        },
+      ],
+    },
+  ],
+  run: run,
+};
