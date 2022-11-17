@@ -9,6 +9,132 @@ import ticketDB from "../models/ticket.js";
 import { createTranscript } from "discord-html-transcripts";
 import config from "../settings/config.js";
 
+async function handleButtonPress(interaction) {
+  const validButtons = ["close", "claim"];
+  if (!validButtons.includes(interaction.customId)) {
+    return;
+  }
+
+  if (!interaction.member.permissions.has("ADMINISTRATOR")) {
+    return interaction.followUp({
+      content: "You must be an administrator to use this button",
+      ephemeral: true,
+    });
+  }
+
+  const ticket = await ticketDB
+    .findOne({ ChannelID: interaction.channel.id })
+    .exec();
+
+  if (!ticket) {
+    return interaction.followUp({
+      content:
+        "No data was found related to this ticket, please remove it manually",
+      ephemeral: true,
+    });
+  }
+
+  switch (interaction.customId) {
+    case "close":
+      if (ticket.Closed) {
+        return interaction.followUp({
+          content: "This ticket is already closed",
+          ephemeral: true,
+        });
+      }
+
+      const transcriptAttachment = await createTranscript(interaction.channel, {
+        limit: -1,
+        returnBuffer: false,
+        fileName: `${interaction.channel.name}.html`,
+      });
+
+      // Update the database entry
+      await ticketDB.updateOne(
+        { ChannelID: interaction.channel.id },
+        { Closed: true }
+      );
+
+      // Get the user who opened the ticket
+      const member = interaction.guild.members.cache.get(ticket.MemberID);
+
+      // Send the transcript to the log channel
+      const message = await interaction.guild.channels.cache
+        .get(config.TICKET.TRANSCRIPT_CHANNEL_ID)
+        .send({
+          embeds: [
+            new MessageEmbed()
+              .setTitle("Ticket Closed - Transcript")
+              .setDescription(
+                `${interaction.user.tag} has closed a ticket\nTicket User: ${member.user.tag}\nTicket Type: ${ticket.Type}\nTicketID: ${ticket.TicketID}`
+              )
+              .setColor("#0099ff"),
+          ],
+          files: [transcriptAttachment],
+        });
+
+      // Send the transcript to the user
+      member
+        .send({
+          embeds: [
+            new MessageEmbed()
+              .setTitle("Ticket Closed - Transcript")
+              .setDescription(
+                `Your ticket has been closed\n\nTicket Type: ${ticket.Type}\nTicket ticketID: ${ticket.TicketID}`
+              )
+              .setColor("#0099ff"),
+          ],
+          files: [transcriptAttachment],
+        })
+        // Catch errors if the user has DMs disabled
+        .catch(() => {});
+
+      interaction.followUp({
+        embeds: [
+          new MessageEmbed()
+            .setTitle("Ticket Closed")
+            .setDescription(
+              `This ticket is being closed, [here is the transcript](${message.url})`
+            )
+            .setColor("#0099ff"),
+        ],
+      });
+
+      // Delete the channel and ticket after 10 seconds
+      setTimeout(() => {
+        interaction.channel.delete();
+        ticketDB.deleteOne({ ChannelID: interaction.channel.id }, (err) => {
+          if (err) throw err;
+        });
+      }, 10 * 1000);
+      break;
+
+    case "claim":
+      if (ticket.Claimed) {
+        return interaction.followUp({
+          content: "This ticket is already claimed",
+          ephemeral: true,
+        });
+      }
+
+      // Update the database entry
+      await ticketDB.updateOne(
+        { ChannelID: interaction.channel.id },
+        { Claimed: true }
+      );
+
+      interaction.channel.send({
+        embeds: [
+          new MessageEmbed()
+            .setDescription(
+              `This ticket has been claimed by ${interaction.user}`
+            )
+            .setColor("#0099ff"),
+        ],
+      });
+  }
+}
+
 client.on("interactionCreate", async (interaction) => {
   // Slash Command Handling
   if (interaction.isCommand()) {
@@ -41,129 +167,7 @@ client.on("interactionCreate", async (interaction) => {
   if (interaction.isButton()) {
     await interaction.deferUpdate();
 
-    if (["close", "claim"].includes(interaction.customId)) {
-      if (!interaction.member.permissions.has("ADMINISTRATOR")) {
-        return interaction.followUp({
-          content: "You must be an administrator to use this button",
-          ephemeral: true,
-        });
-      }
-
-      const ticket = await ticketDB.findOne({
-        ChannelID: interaction.channel.id,
-      }).exec();
-
-      if (!ticket) {
-        return interaction.followUp({
-          content:
-            "No data was found related to this ticket, please remove it manually",
-          ephemeral: true,
-        });
-      }
-
-      switch (interaction.customId) {
-        case "close":
-          if (ticket.Closed) {
-            return interaction.followUp({
-              content: "This ticket is already closed",
-              ephemeral: true,
-            });
-          }
-
-          const transcriptAttachment = await createTranscript(
-            interaction.channel,
-            {
-              limit: -1,
-              returnBuffer: false,
-              fileName: `${interaction.channel.name}.html`,
-            }
-          );
-
-          // Update the database entry
-          await ticketDB.updateOne(
-            { ChannelID: interaction.channel.id },
-            { Closed: true }
-          );
-
-          // Get the user who opened the ticket
-          const member = interaction.guild.members.cache.get(ticket.MemberID);
-
-          // Send the transcript to the log channel
-          const message = await interaction.guild.channels.cache
-            .get(config.TICKET.TRANSCRIPT_CHANNEL_ID)
-            .send({
-              embeds: [
-                new MessageEmbed()
-                  .setTitle("Ticket Closed - Transcript")
-                  .setDescription(
-                    `${interaction.user.tag} has closed a ticket\nTicket User: ${member.user.tag}\nTicket Type: ${ticket.Type}\nTicketID: ${ticket.TicketID}`
-                  )
-                  .setColor("#0099ff"),
-              ],
-              files: [transcriptAttachment],
-            });
-
-          // Send the transcript to the user
-          member
-            .send({
-              embeds: [
-                new MessageEmbed()
-                  .setTitle("Ticket Closed - Transcript")
-                  .setDescription(
-                    `Your ticket has been closed\n\nTicket Type: ${ticket.Type}\nTicket ticketID: ${ticket.TicketID}`
-                  )
-                  .setColor("#0099ff"),
-              ],
-              files: [transcriptAttachment],
-            })
-            // Catch errors if the user has DMs disabled
-            .catch(() => {});
-
-          interaction.followUp({
-            embeds: [
-              new MessageEmbed()
-                .setTitle("Ticket Closed")
-                .setDescription(
-                  `This ticket is being closed, [here is the transcript](${message.url})`
-                )
-                .setColor("#0099ff"),
-            ],
-          });
-
-          // Delete the channel and ticket after 10 seconds
-          setTimeout(() => {
-            interaction.channel.delete();
-            ticketDB.deleteOne({ ChannelID: interaction.channel.id }, (err) => {
-              if (err) throw err;
-            });
-          }, 10 * 1000);
-          break;
-
-        case "claim":
-          if (ticket.Claimed) {
-            return interaction.followUp({
-              content: "This ticket is already claimed",
-              ephemeral: true,
-            });
-          }
-
-          // Update the database entry
-          await ticketDB.updateOne(
-            { ChannelID: interaction.channel.id },
-            { Claimed: true }
-          );
-
-          interaction.channel.send({
-            embeds: [
-              new MessageEmbed()
-                .setDescription(
-                  `This ticket has been claimed by ${interaction.user}`
-                )
-                .setColor("#0099ff"),
-            ],
-          });
-      }
-    }
+    await ahandleButtonPress(interaction);
   }
 
   // Select Menu Handling
@@ -254,7 +258,9 @@ client.on("interactionCreate", async (interaction) => {
       });
     }
 
-    const ticket = await ticketDB.findOne({ ChannelID: interaction.channel.id }).exec();
+    const ticket = await ticketDB
+      .findOne({ ChannelID: interaction.channel.id })
+      .exec();
 
     if (value === "lock") {
       if (!interaction.member.permissions.has("ADMINISTRATOR")) {
@@ -271,7 +277,10 @@ client.on("interactionCreate", async (interaction) => {
         });
       }
 
-      await ticketDB.updateOne({ ChannelID: interaction.channel.id }, { Locked: true });
+      await ticketDB.updateOne(
+        { ChannelID: interaction.channel.id },
+        { Locked: true }
+      );
 
       interaction.channel.permissionOverwrites.edit(ticket.MemberID, {
         SEND_MESSAGES: false,
@@ -300,7 +309,10 @@ client.on("interactionCreate", async (interaction) => {
         });
       }
 
-      await ticketDB.updateOne({ ChannelID: interaction.channel.id }, { Locked: false });
+      await ticketDB.updateOne(
+        { ChannelID: interaction.channel.id },
+        { Locked: false }
+      );
 
       interaction.channel.permissionOverwrites.edit(ticket.MemberID, {
         SEND_MESSAGES: true,
