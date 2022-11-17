@@ -1,19 +1,15 @@
-const { Client, Collection } = require("discord.js");
-const mongoose = require("mongoose");
+import { Client, Collection } from "discord.js";
+import mongoose from "mongoose";
+import config from "./settings/config.js";
+import handler from "./handler/index.js";
 
-require("dotenv").config();
-
-const client = new Client({
-  intents: 32767,
-});
-module.exports = client;
+const client = new Client({ intents: 32767 });
 
 client.commands = new Collection();
 client.slashCommands = new Collection();
-client.config = require("./settings/config.js");
 
 mongoose
-  .connect(client.config.MONGO_URI, {
+  .connect(config.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
@@ -22,5 +18,8 @@ mongoose
     console.log("\x1b[31m[-] \x1b[0mDatabase Connection Error: " + err)
   );
 
-require("./handler")(client);
-client.login(client.config.TOKEN);
+handler(client);
+
+client.login(config.TOKEN);
+
+export default client;

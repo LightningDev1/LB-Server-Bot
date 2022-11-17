@@ -1,7 +1,6 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+import mongoose from 'mongoose';
 
-const ticket = new Schema({
+const ticket = new mongoose.Schema({
     GuildID: String,
     MemberID: String,
     TicketID: String,
@@ -13,4 +12,4 @@ const ticket = new Schema({
     Users: Array,
 });
 
-module.exports = mongoose.model('ticket', ticket);
+export default mongoose.model('ticket', ticket);

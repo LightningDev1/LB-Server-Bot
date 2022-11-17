@@ -1,13 +1,13 @@
-const client = require("../index");
-const {
+import client from "../index.js";
+import {
   MessageEmbed,
   MessageActionRow,
   MessageButton,
   MessageSelectMenu,
-} = require("discord.js");
-const ticketDB = require("../models/Ticket");
-const { createTranscript } = require("discord-html-transcripts");
-const config = require("../settings/config.js");
+} from "discord.js";
+import ticketDB from "../models/Ticket.js";
+import { createTranscript } from "discord-html-transcripts";
+import config from "../settings/config.js";
 
 client.on("interactionCreate", async (interaction) => {
   // Slash Command Handling
@@ -49,9 +49,9 @@ client.on("interactionCreate", async (interaction) => {
         });
       }
 
-      const ticket = await ticketDB
-        .findOne({ ChannelID: interaction.channel.id })
-        .exec();
+      const ticket = await ticketDB.findOne({
+        ChannelID: interaction.channel.id,
+      }).exec();
 
       if (!ticket) {
         return interaction.followUp({
@@ -253,9 +253,7 @@ client.on("interactionCreate", async (interaction) => {
       });
     }
 
-    const ticket = await ticketDB
-      .findOne({ ChannelID: interaction.channel.id })
-      .exec();
+    const ticket = await ticketDB.findOne({ ChannelID: interaction.channel.id }).exec();
 
     if (value === "lock") {
       if (!interaction.member.permissions.has("ADMINISTRATOR")) {
@@ -272,10 +270,7 @@ client.on("interactionCreate", async (interaction) => {
         });
       }
 
-      await ticketDB.updateOne(
-        { ChannelID: interaction.channel.id },
-        { Locked: true }
-      );
+      await ticketDB.updateOne({ ChannelID: interaction.channel.id }, { Locked: true });
 
       interaction.channel.permissionOverwrites.edit(ticket.MemberID, {
         SEND_MESSAGES: false,
@@ -304,10 +299,7 @@ client.on("interactionCreate", async (interaction) => {
         });
       }
 
-      await ticketDB.updateOne(
-        { ChannelID: interaction.channel.id },
-        { Locked: false }
-      );
+      await ticketDB.updateOne({ ChannelID: interaction.channel.id }, { Locked: false });
 
       interaction.channel.permissionOverwrites.edit(ticket.MemberID, {
         SEND_MESSAGES: true,

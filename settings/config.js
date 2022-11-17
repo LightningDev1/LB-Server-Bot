@@ -1,4 +1,8 @@
-module.exports = {
+import { config } from "dotenv";
+
+config();
+
+export default {
   TOKEN: process.env.TOKEN, // bot token
   MONGO_URI: process.env.MONGO_URI, // for the ticket system to work
   GUILD_ID: "838151831086825533", // server id where the slashcommands will register

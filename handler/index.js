@@ -1,23 +1,26 @@
-const { glob } = require("glob");
-const { promisify } = require("util");
+import glob from "glob";
+import { promisify } from "util";
+import config from "../settings/config.js";
+
 const globPromise = promisify(glob);
 
-module.exports = async (client) => {
-  const eventFiles = await globPromise(`${process.cwd()}/events/*.js`);
-  eventFiles.map((value) => require(value));
+export default async (client) => {
+  const cwd = process.cwd().replace(/\\/g, "/");
+  const eventFiles = await globPromise(`${cwd}/events/*.js`);
+  eventFiles.map((value) => import(value.replace(cwd, "../")));
 
-  const slashCommands = await globPromise(`${process.cwd()}/commands/*.js`);
+  const slashCommands = await globPromise(`${cwd}/commands/*.js`);
   const arrayOfSlashCommands = [];
   slashCommands.map((value) => {
-    const file = require(value);
+    const file = import(value.replace(cwd, "../"));
     if (!file?.name) return;
     client.slashCommands.set(file.name, file);
-    if(file.userPermissions) file.defaultPermission = false;
+    if (file.userPermissions) file.defaultPermission = false;
     arrayOfSlashCommands.push(file);
   });
 
-  client.on('ready', async () => {
-    const guild = client.guilds.cache.get(client.config.GUILD_ID);
-    await guild.commands.set(arrayOfSlashCommands)
-  })
+  client.on("ready", async () => {
+    const guild = client.guilds.cache.get(config.GUILD_ID);
+    await guild.commands.set(arrayOfSlashCommands);
+  });
 };
