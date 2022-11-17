@@ -4,8 +4,6 @@ import ticketDB from "../models/ticket.js";
 const subCommands = ["setup", "action"];
 
 async function run(client, interaction, args) {
-  console.log("run args: ", args);
-
   if (!subCommands.includes(args.subCommand)) {
     return;
   }
