@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const ticket = new mongoose.Schema({
+const ticketSchema = new mongoose.Schema({
     GuildID: String,
     MemberID: String,
     TicketID: String,
@@ -12,4 +12,4 @@ const ticket = new mongoose.Schema({
     Users: Array,
 });
 
-export default mongoose.model('ticket', ticket);
+export default mongoose.model('ticket', ticketSchema);

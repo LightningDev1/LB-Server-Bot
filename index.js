@@ -13,6 +13,7 @@ client.commands = new Collection();
 client.slashCommands = new Collection();
 
 (async () => {
+  // Connect to the MongoDB database
   try {
     mongoose.connect(config.MONGO_URI, {
       useNewUrlParser: true,
@@ -22,6 +23,8 @@ client.slashCommands = new Collection();
   } catch (err) {
     console.log("\x1b[31m[-] \x1b[0mDatabase Connection Error: " + err);
   }
+
+  // Import all events and slash commands
 
   const cwd = process.cwd().replace(/\\/g, "/");
 
@@ -33,20 +36,22 @@ client.slashCommands = new Collection();
     import(filePath);
   });
 
+  // Crate an array of the slash commands
   const arrayOfSlashCommands = [];
   slashCommandFiles.map((filePath) => {
     filePath = filePath.replace(cwd, ".");
-    const file = import(filePath);
+    const command = import(filePath);
 
-    if (!file?.name) return;
+    if (!command?.name) return;
 
-    client.slashCommands.set(file.name, file);
-    arrayOfSlashCommands.push(file);
+    client.slashCommands.set(command.name, command);
+    arrayOfSlashCommands.push(command);
 
-    if (file.userPermissions) file.defaultPermission = false;
+    if (command.userPermissions) command.defaultPermission = false;
   });
 
   client.on("ready", async () => {
+    // Set the slash commands
     const guild = client.guilds.cache.get(config.GUILD_ID);
     await guild.commands.set(arrayOfSlashCommands);
   });

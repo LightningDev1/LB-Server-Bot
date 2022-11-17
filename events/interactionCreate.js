@@ -5,7 +5,7 @@ import {
   MessageButton,
   MessageSelectMenu,
 } from "discord.js";
-import ticketDB from "../models/Ticket.js";
+import ticketDB from "../models/ticket.js";
 import { createTranscript } from "discord-html-transcripts";
 import config from "../settings/config.js";
 
@@ -166,6 +166,7 @@ client.on("interactionCreate", async (interaction) => {
     }
   }
 
+  // Select Menu Handling
   if (interaction.isSelectMenu()) {
     await interaction.deferUpdate();
     var value = interaction.values[0];
