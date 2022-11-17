@@ -169,7 +169,7 @@ client.on("interactionCreate", async (interaction) => {
   // Select Menu Handling
   if (interaction.isSelectMenu()) {
     await interaction.deferUpdate();
-    var value = interaction.values[0];
+    let value = interaction.values[0];
 
     if (["purchase", "support", "report"].includes(value)) {
       const ticketID = Math.floor(Math.random() * 90000) + 10000;

@@ -25,30 +25,29 @@ client.slashCommands = new Collection();
   }
 
   // Import all events and slash commands
-
   const cwd = process.cwd().replace(/\\/g, "/");
 
   const eventFiles = await globPromise(`${cwd}/events/*.js`);
   const slashCommandFiles = await globPromise(`${cwd}/commands/*.js`);
 
-  eventFiles.map((filePath) => {
+  eventFiles.map(async (filePath) => {
     filePath = filePath.replace(cwd, ".");
-    import(filePath);
+    await import(filePath);
   });
 
   // Crate an array of the slash commands
   const arrayOfSlashCommands = [];
-  slashCommandFiles.map((filePath) => {
+
+  for (let filePath of slashCommandFiles) {
     filePath = filePath.replace(cwd, ".");
-    const command = import(filePath);
+    let command = await import(filePath);
 
     if (!command?.name) return;
 
     client.slashCommands.set(command.name, command);
-    arrayOfSlashCommands.push(command);
 
-    if (command.userPermissions) command.defaultPermission = false;
-  });
+    arrayOfSlashCommands.push(command);
+  }
 
   client.on("ready", async () => {
     // Set the slash commands

@@ -5,6 +5,7 @@ export const name = "ticket";
 export const description = "Ticket";
 export const type = "CHAT_INPUT";
 export const userPermissions = ["ADMINISTRATOR"];
+export const defaultPermission = false;
 export const options = [
   {
     name: "setup",
@@ -50,7 +51,10 @@ export const options = [
     ],
   },
 ];
+
 export async function run(client, interaction, args) {
+  await interaction.deferReply({ ephemeral: true });
+
   const [SubCommand] = args;
 
   if (!interaction.member.permissions.has("ADMINISTRATOR"))
