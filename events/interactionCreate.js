@@ -152,10 +152,11 @@ client.on("interactionCreate", async (interaction) => {
           break;
       }
     }
-    
+
     interaction.member = interaction.guild.members.cache.get(
       interaction.user.id
     );
+
     cmd.run(client, interaction, args);
   }
 
