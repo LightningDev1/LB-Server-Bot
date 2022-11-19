@@ -140,24 +140,11 @@ client.on("interactionCreate", async (interaction) => {
     const cmd = client.slashCommands.get(interaction.commandName);
     if (!cmd) return interaction.reply({ content: "An error has occurred" });
 
-    const args = {};
-    for (let option of interaction.options.data) {
-      switch (option.type) {
-        case "SUB_COMMAND":
-          args.subCommand = option.name;
-          args.options = option.options;
-          break;
-        default:
-          args[option.name] = option.value;
-          break;
-      }
-    }
-
     interaction.member = interaction.guild.members.cache.get(
       interaction.user.id
     );
 
-    cmd.run(client, interaction, args);
+    cmd.run(client, interaction);
   }
 
   // Context Menu Handling

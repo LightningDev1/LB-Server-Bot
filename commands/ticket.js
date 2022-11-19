@@ -3,8 +3,10 @@ import ticketDB from "../models/ticket.js";
 
 const subCommands = ["setup", "action"];
 
-async function run(client, interaction, args) {
-  if (!subCommands.includes(args.subCommand)) {
+async function run(client, interaction) {
+  const subCommand = interaction.options.getSubcommand();
+  
+  if (!subCommands.includes(subCommand)) {
     return;
   }
 
@@ -14,7 +16,7 @@ async function run(client, interaction, args) {
     });
   }
 
-  if (args.subCommand == "setup") {
+  if (subCommand == "setup") {
     const ticketChannel = interaction.options.getChannel("channel");
 
     const embed = new MessageEmbed()
@@ -61,7 +63,7 @@ async function run(client, interaction, args) {
       ],
       ephemeral: true,
     });
-  } else if (args.subCommand == "action") {
+  } else if (subCommand == "action") {
     const action = interaction.options.getString("action");
     const user = interaction.options.getUser("user");
 

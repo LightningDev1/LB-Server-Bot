@@ -4,6 +4,7 @@ import { promisify } from "util";
 import mongoose from "mongoose";
 
 import config from "./settings/config.js";
+import ApiWrapper from "./apiwrapper/apiwrapper.js";
 
 const globPromise = promisify(glob);
 
@@ -12,8 +13,10 @@ const client = new Client({ intents: 32767 });
 client.commands = new Collection();
 client.slashCommands = new Collection();
 
+client.apiWrapper = new ApiWrapper(config.API_URL);
+
 process.on("unhandledRejection", (err) => {
-  console.log(err);
+  console.error(err);
 });
 
 (async () => {

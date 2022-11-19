@@ -16,4 +16,6 @@ export default {
     CATEGORY_ID: "1041302484737609808",
     TRANSCRIPT_CHANNEL_ID: "1041302526626123796",
   },
+
+  API_URL: "http://localhost:8000",
 };
