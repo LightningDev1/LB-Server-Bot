@@ -77,7 +77,7 @@ async function run(client, interaction) {
   let embed = new MessageEmbed()
     .setTitle("Success")
     .setDescription(
-      `Your Discord account has been linked to the LightningBot account \`${keyData.redeemed_by}\`!`
+      `Your Discord account has been linked to the LightningBot account \`${keyData.redeemed_by.username}\`!`
     )
     .setColor("GREEN");
 
