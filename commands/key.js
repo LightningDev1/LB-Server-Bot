@@ -55,7 +55,7 @@ async function run(client, interaction) {
         .addField("Created By", keyData.created_by)
         .addField("Created At", keyData.created_at.toString())
         .addField("Create Reason", keyData.create_reason)
-        .addField("Redeemed By", keyData.redeemed_by)
+        .addField("Redeemed By", keyData.redeemed_by.username)
         .setColor("GREEN");
 
       return interaction.reply({ embeds: [embed], ephemeral });
