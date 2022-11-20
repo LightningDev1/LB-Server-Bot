@@ -75,7 +75,7 @@ export default {
   description: "Key Administration",
   type: "CHAT_INPUT",
   userPermissions: ["ADMINISTRATOR"],
-  defaultPermission: true,
+  defaultPermission: false,
   options: [
     {
       name: "create",

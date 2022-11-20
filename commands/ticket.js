@@ -152,7 +152,7 @@ export default {
   description: "Ticket System",
   type: "CHAT_INPUT",
   userPermissions: ["ADMINISTRATOR"],
-  defaultPermission: true,
+  defaultPermission: false,
   options: [
     {
       name: "setup",
