@@ -6,26 +6,13 @@ class ApiWrapper {
   }
 
   async CreateKey(createdBy) {
-    return await this.http.Post(
-      "/api/v3/discord-bot/create-key",
-      {
-        created_by: createdBy,
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: process.env.API_KEY,
-        },
-      }
-    );
+    return await this.http.Post("/api/v3/discord-bot/create-key", {
+      created_by: createdBy,
+    });
   }
 
   async CheckKey(key) {
-    return await this.http.Get(`/api/v3/discord-bot/check-key?key=${key}`, {
-      headers: {
-        Authorization: process.env.API_KEY,
-      },
-    });
+    return await this.http.Get(`/api/v3/discord-bot/check-key?key=${key}`);
   }
 }
 

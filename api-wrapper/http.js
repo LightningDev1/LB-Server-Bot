@@ -18,7 +18,7 @@ class HTTP {
   }
   async Post(path, data, requestConfig) {
     const headers = {
-      ...requestConfig.headers,
+      ...requestConfig?.headers,
       ...this.defaultHeaders,
     };
     if (data !== null) {
@@ -43,7 +43,7 @@ class HTTP {
       method: "GET",
       credentials: "include",
       mode: "cors",
-      headers: { ...requestConfig.headers, ...this.defaultHeaders },
+      headers: { ...requestConfig?.headers, ...this.defaultHeaders },
     });
     const json = await res.json();
     return new ApiResponse(res, json);
