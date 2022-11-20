@@ -1,14 +1,14 @@
 {
   "name": "lighningbot",
   "version": "1.0.0",
-  "description": "Custom bot for lightningbot server",
+  "description": "Custom bot for LightningBot server",
   "main": "index.js",
   "type": "module",
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js"
   },
-  "author": "aledlb8",
+  "author": "aledlb8 & LightningDev1",
   "license": "MIT",
   "dependencies": {
     "canvas": "^2.10.2",
