@@ -4,7 +4,7 @@ import { promisify } from "util";
 import mongoose from "mongoose";
 
 import config from "./settings/config.js";
-import ApiWrapper from "./apiwrapper/apiwrapper.js";
+import ApiWrapper from "./apiwrapper/api-wrapper.js";
 
 const globPromise = promisify(glob);
 

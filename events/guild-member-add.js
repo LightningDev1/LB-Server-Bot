@@ -1,6 +1,6 @@
 import { MessageEmbed } from "discord.js";
 
-import createWelcomeImage from "../utils/welcomeImage.js";
+import createWelcomeImage from "../utils/welcome-image.js";
 import config from "../settings/config.js";
 import client from "../index.js";
 

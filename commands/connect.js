@@ -1,5 +1,5 @@
 import { MessageEmbed, MessageActionRow, MessageSelectMenu } from "discord.js";
-import accountConnectionDB from "../models/accountConnection.js";
+import accountConnectionDB from "../models/account-connection.js";
 import config from "../settings/config.js";
 
 async function run(client, interaction) {
