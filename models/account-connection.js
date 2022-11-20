@@ -6,4 +6,9 @@ const accountConnectionSchema = new mongoose.Schema({
   Key: String,
 });
 
-export default mongoose.model("accountConnection", accountConnectionSchema);
+const accountConnectionDB = mongoose.model(
+  "account-connection",
+  accountConnectionSchema
+);
+
+export { accountConnectionDB };

@@ -9,7 +9,7 @@ async function run(client, interaction) {
   interaction.reply({ embeds: [embed] });
 }
 
-export default {
+export const command = {
   name: "latency",
   description: "Show the bot's latency",
   type: "CHAT_INPUT",

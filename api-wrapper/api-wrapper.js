@@ -1,8 +1,8 @@
-import HTTP from "./http.js";
+import { HTTP } from "./http.js";
 
 class ApiWrapper {
   constructor(apiUrl) {
-    this.http = new HTTP(apiUrl);
+    this.http = new HTTP(apiUrl, process.env.API_KEY);
   }
 
   async CreateKey(createdBy) {
@@ -29,4 +29,4 @@ class ApiWrapper {
   }
 }
 
-export default ApiWrapper;
+export { ApiWrapper };

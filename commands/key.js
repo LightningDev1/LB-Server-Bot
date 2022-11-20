@@ -1,4 +1,4 @@
-import { MessageEmbed, MessageActionRow, MessageSelectMenu } from "discord.js";
+import { MessageEmbed } from "discord.js";
 
 const subCommands = ["create", "check"];
 
@@ -70,7 +70,7 @@ async function run(client, interaction) {
   }
 }
 
-export default {
+export const command = {
   name: "key",
   description: "Key Administration",
   type: "CHAT_INPUT",

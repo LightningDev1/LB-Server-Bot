@@ -74,4 +74,4 @@ async function createWelcomeImage(member) {
   return new MessageAttachment(canvas.toBuffer(), "welcome-image.png");
 }
 
-export default createWelcomeImage;
+export { createWelcomeImage };

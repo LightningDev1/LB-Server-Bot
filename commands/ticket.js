@@ -1,5 +1,5 @@
 import { MessageEmbed, MessageActionRow, MessageSelectMenu } from "discord.js";
-import ticketDB from "../models/ticket.js";
+import { ticketDB } from "../models/ticket.js";
 
 const subCommands = ["setup", "action"];
 
@@ -147,7 +147,7 @@ async function run(client, interaction) {
   }
 }
 
-export default {
+export const command = {
   name: "ticket",
   description: "Ticket System",
   type: "CHAT_INPUT",

@@ -1,15 +1,17 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const ticketSchema = new mongoose.Schema({
-    GuildID: String,
-    MemberID: String,
-    TicketID: String,
-    ChannelID: String,
-    Closed: Boolean,
-    Locked: Boolean,
-    Type: String,
-    Claimed: Boolean,
-    Users: Array,
+  GuildID: String,
+  MemberID: String,
+  TicketID: String,
+  ChannelID: String,
+  Closed: Boolean,
+  Locked: Boolean,
+  Type: String,
+  Claimed: Boolean,
+  Users: Array,
 });
 
-export default mongoose.model('ticket', ticketSchema);
+const ticketDB = mongoose.model("ticket", ticketSchema);
+
+export { ticketDB };

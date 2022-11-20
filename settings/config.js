@@ -1,8 +1,8 @@
-import { config } from "dotenv";
+import { config as dotenvConfig } from "dotenv";
 
-config();
+dotenvConfig();
 
-export default {
+export const config = {
   TOKEN: process.env.TOKEN,
   MONGO_URI: process.env.MONGO_URI,
   API_URL: "http://localhost:8000",
@@ -14,7 +14,7 @@ export default {
 
   GUILD_ID: "838151831086825533",
   WELCOME_CHANNEL_ID: "1043634985304870992",
-  VERIFIED_USER_ROLE_ID: "768835534440759297",
+  VERIFIED_USER_ROLE_ID: "1043896826631290880",
 
   TICKET: {
     CATEGORY_ID: "1041302484737609808",

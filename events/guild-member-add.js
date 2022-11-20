@@ -1,8 +1,8 @@
 import { MessageEmbed } from "discord.js";
 
-import createWelcomeImage from "../utils/welcome-image.js";
-import config from "../settings/config.js";
-import client from "../index.js";
+import { createWelcomeImage } from "../utils/welcome-image.js";
+import { config } from "../settings/config.js";
+import { client } from "../index.js";
 
 client.on("guildMemberAdd", async (member) => {
   if (member.guild.id !== config.GUILD_ID) return;

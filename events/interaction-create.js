@@ -1,13 +1,14 @@
-import client from "../index.js";
 import {
   MessageEmbed,
   MessageActionRow,
   MessageButton,
   MessageSelectMenu,
 } from "discord.js";
-import ticketDB from "../models/ticket.js";
 import { createTranscript } from "discord-html-transcripts";
-import config from "../settings/config.js";
+
+import { ticketDB } from "../models/ticket.js";
+import { config } from "../settings/config.js";
+import { client } from "../index.js";
 
 async function handleButtonPress(interaction) {
   const validButtons = ["close", "claim"];

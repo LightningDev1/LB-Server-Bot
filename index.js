@@ -3,8 +3,8 @@ import { Client, Collection } from "discord.js";
 import { promisify } from "util";
 import mongoose from "mongoose";
 
-import config from "./settings/config.js";
-import ApiWrapper from "./apiwrapper/api-wrapper.js";
+import { config } from "./settings/config.js";
+import { ApiWrapper } from "./api-wrapper/api-wrapper.js";
 
 const globPromise = promisify(glob);
 
@@ -47,7 +47,7 @@ process.on("unhandledRejection", (err) => {
 
   for (let filePath of slashCommandFiles) {
     filePath = filePath.replace(cwd, ".");
-    let command = (await import(filePath)).default;
+    const { command } = await import(filePath);
 
     if (!command?.name) return;
 
@@ -65,4 +65,4 @@ process.on("unhandledRejection", (err) => {
   await client.login(config.TOKEN);
 })();
 
-export default client;
+export { client };

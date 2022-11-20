@@ -1,6 +1,6 @@
-import { MessageEmbed, MessageActionRow, MessageSelectMenu } from "discord.js";
-import accountConnectionDB from "../models/account-connection.js";
-import config from "../settings/config.js";
+import { MessageEmbed } from "discord.js";
+import { accountConnectionDB } from "../models/account-connection.js";
+import { config } from "../settings/config.js";
 
 async function run(client, interaction) {
   const key = interaction.options.getString("key");
@@ -18,15 +18,17 @@ async function run(client, interaction) {
 
   const keyData = response.json.key;
 
-  if (keyData.redeemed_by === "Not Redeemed") {
+  // Check if the key has been redeemed
+  if (keyData.redeemed_by.id === "") {
     const embed = new MessageEmbed()
       .setTitle("Error")
-      .setDescription("That key does not have an account associated with it.")
+      .setDescription("That key does not have an account associated with it!")
       .setColor("RED");
 
     return interaction.reply({ embeds: [embed], ephemeral: true });
   }
 
+  // Check if the key already has an account connected
   const keyConnection = await accountConnectionDB.findOne({ Key: key });
 
   if (keyConnection) {
@@ -38,6 +40,7 @@ async function run(client, interaction) {
     return interaction.reply({ embeds: [embed], ephemeral: true });
   }
 
+  // Check if the user already has an account connected
   const accountConnection = await accountConnectionDB.findOne({
     DiscordID: interaction.user.id,
   });
@@ -57,8 +60,7 @@ async function run(client, interaction) {
     Key: key,
   });
 
-  // add verified role to user
-
+  // Add the verified role to the user
   const role = interaction.guild.roles.cache.get(config.VERIFIED_USER_ROLE_ID);
 
   if (!role) {
@@ -82,7 +84,7 @@ async function run(client, interaction) {
   interaction.reply({ embeds: [embed], ephemeral: true });
 }
 
-export default {
+export const command = {
   name: "connect",
   description: "Connect your Discord account to your LightningBot account",
   type: "CHAT_INPUT",
