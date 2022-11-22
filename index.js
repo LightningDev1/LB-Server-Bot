@@ -12,6 +12,7 @@ const client = new Client({ intents: 32767 });
 
 client.commands = new Collection();
 client.slashCommands = new Collection();
+client.interactions = new Collection();
 
 client.apiWrapper = new ApiWrapper(config.API_URL);
 
@@ -36,6 +37,7 @@ process.on("unhandledRejection", (err) => {
 
   const eventFiles = await globPromise(`${cwd}/events/*.js`);
   const slashCommandFiles = await globPromise(`${cwd}/commands/*.js`);
+  const interactionFiles = await globPromise(`${cwd}/interactions/*.js`);
 
   eventFiles.map(async (filePath) => {
     filePath = filePath.replace(cwd, ".");
@@ -54,6 +56,16 @@ process.on("unhandledRejection", (err) => {
     client.slashCommands.set(command.name, command);
 
     arrayOfSlashCommands.push(command);
+  }
+
+  // Register all interactions
+  for (let filePath of interactionFiles) {
+    filePath = filePath.replace(cwd, ".");
+    const { interaction } = await import(filePath);
+
+    if (!interaction?.customId) return;
+
+    client.interactions.set(interaction.customId, interaction);
   }
 
   client.on("ready", async () => {

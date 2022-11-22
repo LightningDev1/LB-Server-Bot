@@ -29,7 +29,7 @@ async function run(client, interaction) {
 
     const row = new MessageActionRow().addComponents(
       new MessageSelectMenu()
-        .setCustomId("ticket")
+        .setCustomId("ticket-create")
         .setPlaceholder("Select a category")
         .setMaxValues(1)
         .addOptions([
