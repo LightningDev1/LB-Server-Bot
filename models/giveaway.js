@@ -10,7 +10,10 @@ const giveawaySchema = new mongoose.Schema({
   Prize: String,
   WinnerAmount: Number,
   Winners: Array,
+  EndTimeout: Number
 });
+
+clearTimeout
 
 const giveawayDB = mongoose.model("giveaway", giveawaySchema);
 

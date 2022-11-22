@@ -1,6 +1,7 @@
 import { MessageActionRow, MessageButton, MessageEmbed } from "discord.js";
 import { parseDuration } from "../utils/parse-duration.js";
 import { generateDescription } from "../utils/giveaway.js";
+import { ensureTimeout } from "../utils/giveaway.js";
 import { giveawayDB } from "../models/giveaway.js";
 
 const subCommands = ["create", "delete", "end", "reroll", "list"];
@@ -67,7 +68,7 @@ async function run(client, interaction) {
         components: [actionRow],
       });
 
-      await giveawayDB.create({
+      const giveaway = await giveawayDB.create({
         GuildID: interaction.guild.id,
         ChannelID: channel.id,
         MessageID: message.id,
@@ -77,7 +78,12 @@ async function run(client, interaction) {
         Prize: prize,
         WinnerAmount: winners,
         Winners: [],
+        EndTimeout: -1,
       });
+
+      giveaway.EndTimeout = ensureTimeout(client, giveaway);
+
+      await giveaway.save();
   }
 
   interaction.reply({ content: "Done!", ephemeral: true });
