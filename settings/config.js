@@ -5,7 +5,7 @@ dotenvConfig();
 export const config = {
   TOKEN: process.env.TOKEN,
   MONGO_URI: process.env.MONGO_URI,
-  API_URL: "http://localhost:8000",
+  API_URL: "https://api.lightning-bot.com",
 
   STATUS: {
     TEXT: "Tickets",
