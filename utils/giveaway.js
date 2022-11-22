@@ -20,7 +20,7 @@ function mentionWinners(winners) {
   return winners.map((winner) => `<@${winner}>`).join(", ");
 }
 
-function ensureTimeout(client, giveaway) {
+async function ensureTimeout(client, giveaway) {
   const currentEpoch = Math.floor(Date.now() / 1000);
 
   if (giveaway.EndEpoch < currentEpoch) {
@@ -81,6 +81,8 @@ function ensureTimeout(client, giveaway) {
   clearTimeout(giveaway.EndTimeout);
 
   giveaway.EndTimeout = timeout;
+
+  await giveaway.save();
 
   return timeout;
 }

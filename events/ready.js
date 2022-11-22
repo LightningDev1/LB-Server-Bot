@@ -14,8 +14,6 @@ client.on("ready", async () => {
   const giveaways = await giveawayDB.find({});
 
   for (const giveaway of giveaways) {
-    giveaway.EndTimeout = ensureTimeout(client, giveaway);
-
-    await giveaway.save();
+    await ensureTimeout(client, giveaway);
   }
 });

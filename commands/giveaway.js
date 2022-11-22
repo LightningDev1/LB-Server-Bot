@@ -81,9 +81,7 @@ async function run(client, interaction) {
         EndTimeout: -1,
       });
 
-      giveaway.EndTimeout = ensureTimeout(client, giveaway);
-
-      await giveaway.save();
+      await ensureTimeout(client, giveaway);
   }
 
   interaction.reply({ content: "Done!", ephemeral: true });
