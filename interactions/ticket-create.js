@@ -62,33 +62,28 @@ async function run(client, interaction) {
     new MessageButton()
       .setCustomId("ticket-close")
       .setLabel("Close")
+      .setEmoji("📪")
       .setStyle("DANGER"),
     new MessageButton()
       .setCustomId("ticket-claim")
       .setLabel("Claim")
+      .setEmoji("🖥️")
+      .setStyle("SUCCESS"),
+    new MessageButton()
+      .setCustomId("ticket-lock")
+      .setLabel("Lock")
+      .setEmoji("🔒")
+      .setStyle("SUCCESS"),
+    new MessageButton()
+      .setCustomId("ticket-unlock")
+      .setLabel("Unlock")
+      .setEmoji("🔓")
       .setStyle("SUCCESS")
-  );
-
-  const actionMenu = new MessageActionRow().addComponents(
-    new MessageSelectMenu()
-      .setCustomId("ticket-action")
-      .setPlaceholder("Select a Action")
-      .setMaxValues(1)
-      .addOptions([
-        {
-          label: "Lock",
-          value: "lock",
-        },
-        {
-          label: "Unlock",
-          value: "unlock",
-        },
-      ])
   );
 
   await ticketChannel.send({
     embeds: [embed],
-    components: [actionButtons, actionMenu],
+    components: [actionButtons],
   });
 
   await interaction.followUp({
