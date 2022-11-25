@@ -1,6 +1,7 @@
 import { MessageEmbed } from "discord.js";
 import { accountConnectionDB } from "../models/account-connection.js";
 import { config } from "../settings/config.js";
+import { getRole } from "../utils/roles.js";
 
 async function run(client, interaction) {
   const key = interaction.options.getString("key");
@@ -61,7 +62,7 @@ async function run(client, interaction) {
   });
 
   // Add the verified role to the user
-  const role = interaction.guild.roles.cache.get(config.VERIFIED_USER_ROLE_ID);
+  const role = getRole(interaction.guild, config.VERIFIED_USER_ROLE_ID);
 
   if (!role) {
     const embed = new MessageEmbed()
