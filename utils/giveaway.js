@@ -67,7 +67,7 @@ async function ensureTimeout(client, giveaway) {
       .setTimestamp(giveaway.EndEpoch * 1000)
       .setColor("#378cbc");
 
-    await message.edit({ embeds: [embed], components: [] });
+    await message.edit({ embeds: [embed] });
 
     await message.reply({
       content:
