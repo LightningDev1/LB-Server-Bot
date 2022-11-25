@@ -1,5 +1,6 @@
 import { MessageEmbed } from "discord.js";
 import { config } from "../settings/config.js";
+import { isUserStaff } from "../utils/staff.js";
 
 const subCommands = ["rules", "bugreports", "suggestions"];
 
@@ -10,7 +11,7 @@ async function run(client, interaction) {
     return;
   }
 
-  if (!interaction.member.permissions.has("ADMINISTRATOR")) {
+  if (!isUserStaff(interaction.member)) {
     return interaction.followUp({
       content: "You must be an administrator to use this command",
     });
@@ -58,7 +59,7 @@ export const command = {
   name: "send",
   description: "Send server information",
   type: "CHAT_INPUT",
-  userPermissions: ["ADMINISTRATOR"],
+  userPermissions: ["ADMINISTRATOR", "MANAGE_CHANNELS"],
   defaultPermission: false,
   options: [
     {

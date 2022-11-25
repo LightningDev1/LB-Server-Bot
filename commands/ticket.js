@@ -1,16 +1,17 @@
 import { MessageEmbed, MessageActionRow, MessageSelectMenu } from "discord.js";
 import { ticketDB } from "../models/ticket.js";
+import { isUserStaff } from "../utils/staff.js";
 
 const subCommands = ["setup", "action"];
 
 async function run(client, interaction) {
   const subCommand = interaction.options.getSubcommand();
-  
+
   if (!subCommands.includes(subCommand)) {
     return;
   }
 
-  if (!interaction.member.permissions.has("ADMINISTRATOR")) {
+  if (!isUserStaff(interaction.member)) {
     return interaction.followUp({
       content: "You must be an administrator to use this command",
     });
@@ -151,7 +152,7 @@ export const command = {
   name: "ticket",
   description: "Ticket System",
   type: "CHAT_INPUT",
-  userPermissions: ["ADMINISTRATOR"],
+  userPermissions: ["ADMINISTRATOR", "MANAGE_CHANNELS"],
   defaultPermission: false,
   options: [
     {

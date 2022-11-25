@@ -4,13 +4,6 @@ import { ticketDB } from "../models/ticket.js";
 import { config } from "../settings/config.js";
 
 async function run(client, interaction) {
-  if (!interaction.member.permissions.has("ADMINISTRATOR")) {
-    return interaction.followUp({
-      content: "You must be an administrator to use this button",
-      ephemeral: true,
-    });
-  }
-
   const ticket = await ticketDB
     .findOne({ ChannelID: interaction.channel.id })
     .exec();

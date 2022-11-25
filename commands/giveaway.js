@@ -3,6 +3,7 @@ import { parseDuration } from "../utils/parse-duration.js";
 import { generateDescription } from "../utils/giveaway.js";
 import { ensureTimeout } from "../utils/giveaway.js";
 import { giveawayDB } from "../models/giveaway.js";
+import { isUserStaff } from "../utils/staff.js";
 
 const subCommands = ["create", "delete", "end", "reroll", "list"];
 
@@ -13,7 +14,7 @@ async function run(client, interaction) {
     return;
   }
 
-  if (!interaction.member.permissions.has("ADMINISTRATOR")) {
+  if (!isUserStaff(interaction.member)) {
     return interaction.followUp({
       content: "You must be an administrator to use this command",
     });
@@ -91,7 +92,7 @@ export const command = {
   name: "giveaway",
   description: "Create a giveaway",
   type: "CHAT_INPUT",
-  userPermissions: ["ADMINISTRATOR"],
+  userPermissions: ["ADMINISTRATOR", "MANAGE_MESSAGES"],
   defaultPermission: false,
   options: [
     {

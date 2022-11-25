@@ -1,14 +1,13 @@
 import { MessageEmbed } from "discord.js";
 import { ticketDB } from "../models/ticket.js";
+import { isUserStaff } from "../utils/staff.js";
 
 async function run(client, interaction) {
-  const value = interaction.values[0];
-
   const ticket = await ticketDB
     .findOne({ ChannelID: interaction.channel.id })
     .exec();
 
-  if (!interaction.member.permissions.has("ADMINISTRATOR")) {
+  if (!isUserStaff(interaction.member)) {
     return interaction.followUp({
       content: "You must be an administrator to use this option",
       ephemeral: true,

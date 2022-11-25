@@ -1,4 +1,5 @@
 import { MessageEmbed } from "discord.js";
+import { isUserStaff } from "../utils/staff.js";
 
 const subCommands = ["create", "check"];
 
@@ -9,7 +10,7 @@ async function run(client, interaction) {
     return;
   }
 
-  if (!interaction.member.permissions.has("ADMINISTRATOR")) {
+  if (!isUserStaff(interaction.member)) {
     return interaction.reply({
       content: "You must be an administrator to use this command",
     });
