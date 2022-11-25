@@ -23,6 +23,11 @@ async function run(client, interaction) {
           id: interaction.member.id,
           allow: ["SEND_MESSAGES", "VIEW_CHANNEL"],
         },
+        // Allow moderators to view the channel
+        {
+          id: config.MOD_ROLE_ID,
+          allow: ["SEND_MESSAGES", "VIEW_CHANNEL"],
+        },
         // Deny everyone else from seeing the channel
         {
           id: interaction.guild.id,
