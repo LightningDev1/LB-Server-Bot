@@ -82,7 +82,7 @@ async function run(client, interaction) {
   });
 
   // Delete the channel and ticket after 10 seconds
-  setTimeout(() => {
+  setTimeout(async () => {
     await interaction.channel.delete();
     ticketDB.deleteOne({ ChannelID: interaction.channel.id }, (err) => {
       if (err) throw err;

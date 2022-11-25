@@ -1,7 +1,11 @@
 import { MessageActionRow, MessageButton, MessageEmbed } from "discord.js";
+import {
+  ensureTimeout,
+  endGiveaway,
+  rerollGiveaway,
+} from "../utils/giveaway.js";
 import { parseDuration } from "../utils/parse-duration.js";
 import { generateDescription } from "../utils/giveaway.js";
-import { ensureTimeout } from "../utils/giveaway.js";
 import { giveawayDB } from "../models/giveaway.js";
 import { isUserStaff } from "../utils/staff.js";
 
@@ -20,72 +24,125 @@ async function run(client, interaction) {
     });
   }
 
-  switch (subCommand) {
-    case "create":
-      const channel = interaction.options.getChannel("channel");
-      const duration = interaction.options.getString("duration");
-      const winners = interaction.options.getInteger("winners");
-      const prize = interaction.options.getString("prize");
+  if (subCommand === "create") {
+    const channel = interaction.options.getChannel("channel");
+    const duration = interaction.options.getString("duration");
+    const winners = interaction.options.getInteger("winners");
+    const prize = interaction.options.getString("prize");
 
-      const parsedDuration = parseDuration(duration);
+    const parsedDuration = parseDuration(duration);
 
-      let endDate = new Date();
-      endDate = new Date(endDate.getTime() + parsedDuration * 1000);
+    let endDate = new Date();
+    endDate = new Date(endDate.getTime() + parsedDuration * 1000);
 
-      const endEpoch = (endDate.getTime() / 1000).toFixed();
+    const endEpoch = (endDate.getTime() / 1000).toFixed();
 
-      if (parsedDuration === 0) {
-        return await interaction.reply({
-          content: "That duration is invalid.",
-          ephemeral: true,
-        });
-      }
+    if (parsedDuration === 0) {
+      return await interaction.reply({
+        content: "That duration is invalid.",
+        ephemeral: true,
+      });
+    }
 
-      if (winners <= 0) {
-        return await interaction.reply({
-          content: "There must be at least 1 winner.",
-          ephemeral: true,
-        });
-      }
+    if (winners <= 0) {
+      return await interaction.reply({
+        content: "There must be at least 1 winner.",
+        ephemeral: true,
+      });
+    }
 
-      const embed = new MessageEmbed()
-        .setTitle(`**${prize}**`)
-        .setDescription(
-          generateDescription(endEpoch, interaction.user.id, 0, winners)
-        )
-        .setTimestamp(endDate)
-        .setColor("#378cbc");
+    const embed = new MessageEmbed()
+      .setTitle(`**${prize}**`)
+      .setDescription(
+        generateDescription(endEpoch, interaction.user.id, 0, winners)
+      )
+      .setTimestamp(endDate)
+      .setColor("#378cbc");
 
-      const actionRow = new MessageActionRow().addComponents(
-        new MessageButton()
-          .setCustomId("giveaway-enter")
-          .setStyle("PRIMARY")
-          .setLabel("Enter")
-          .setEmoji("🎉")
+    const actionRow = new MessageActionRow().addComponents(
+      new MessageButton()
+        .setCustomId("giveaway-enter")
+        .setStyle("PRIMARY")
+        .setLabel("Enter")
+        .setEmoji("🎉")
+    );
+
+    const message = await channel.send({
+      embeds: [embed],
+      components: [actionRow],
+    });
+
+    const giveaway = await giveawayDB.create({
+      GuildID: interaction.guild.id,
+      ChannelID: channel.id,
+      MessageID: message.id,
+      HostID: interaction.user.id,
+      EndEpoch: endEpoch,
+      Entries: [],
+      Prize: prize,
+      WinnerAmount: winners,
+      Winners: [],
+      EndTimeout: -1,
+    });
+
+    await ensureTimeout(client, giveaway);
+  } else if (subCommand === "delete") {
+    const messageId = interaction.options.getString("giveaway_id");
+
+    const giveaway = await giveawayDB.findOne({
+      MessageID: messageId,
+    });
+
+    if (!giveaway) {
+      return await interaction.reply({
+        content: "That giveaway does not exist.",
+        ephemeral: true,
+      });
+    }
+  } else if (subCommand === "end") {
+    const messageId = interaction.options.getString("giveaway_id");
+    await endGiveaway(client, messageId);
+  } else if (subCommand === "reroll") {
+    const messageId = interaction.options.getString("giveaway_id");
+    await rerollGiveaway(client, interaction, messageId);
+  } else if (subCommand === "list") {
+    const giveaways = await giveawayDB.find({
+      GuildID: interaction.guild.id,
+    });
+
+    if (giveaways.length === 0) {
+      return await interaction.reply({
+        content: "There are no giveaways in this server.",
+        ephemeral: true,
+      });
+    }
+
+    const embed = new MessageEmbed().setTitle("Giveaways").setColor("#378cbc");
+
+    for (const giveaway of giveaways) {
+      const guild = client.guilds.cache.get(giveaway.GuildID);
+      const channel = guild.channels.cache.get(giveaway.ChannelID);
+      const message = await channel.messages.fetch(giveaway.MessageID);
+
+      const prize = message.embeds[0].title;
+      const ended = giveaway.EndEpoch < (Date.now() / 1000).toFixed();
+      const endedString = ended ? "Ended" : "Active";
+
+      embed.addField(
+        `${prize} (${endedString})`,
+        `Winners: ${giveaway.WinnerAmount}`
       );
+    }
 
-      const message = await channel.send({
-        embeds: [embed],
-        components: [actionRow],
-      });
-
-      const giveaway = await giveawayDB.create({
-        GuildID: interaction.guild.id,
-        ChannelID: channel.id,
-        MessageID: message.id,
-        HostID: interaction.user.id,
-        EndEpoch: endEpoch,
-        Entries: [],
-        Prize: prize,
-        WinnerAmount: winners,
-        Winners: [],
-        EndTimeout: -1,
-      });
-
-      await ensureTimeout(client, giveaway);
+    await interaction.reply({
+      embeds: [embed],
+      ephemeral: true,
+    });
   }
 
-  interaction.reply({ content: "Done!", ephemeral: true });
+  if (subCommand !== "list") {
+    await interaction.reply({ content: "Done!", ephemeral: true });
+  }
 }
 
 export const command = {
@@ -170,14 +227,6 @@ export const command = {
       name: "list",
       description: "List all giveaways",
       type: "SUB_COMMAND",
-      options: [
-        {
-          name: "giveaway_id",
-          description: "Message ID of the giveaway",
-          type: "STRING",
-          required: true,
-        },
-      ],
     },
   ],
   run: run,
