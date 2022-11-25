@@ -53,4 +53,4 @@ const releaseConfig = {
   },
 };
 
-export default DEBUG ? debugConfig : releaseConfig;
+export const config = DEBUG ? debugConfig : releaseConfig;
