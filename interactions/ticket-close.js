@@ -18,7 +18,7 @@ async function run(client, interaction) {
 
   if (ticket.Closed) {
     return interaction.followUp({
-      content: "This ticket is already closed",
+      content: "This ticket is already closed!",
       ephemeral: true,
     });
   }

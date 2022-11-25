@@ -55,30 +55,14 @@ async function run(client, interaction) {
     .setDescription(
       "Please describe your problem as detailed as possible. A staff member will be with you shortly."
     )
-    .setColor("#0099ff")
-    .setFooter({ text: "🚫 Buttons below are staff only 🚫" });
+    .setColor("#0099ff");
 
   const actionButtons = new MessageActionRow().addComponents(
     new MessageButton()
       .setCustomId("ticket-close")
-      .setLabel("Close")
-      .setEmoji("📪")
-      .setStyle("DANGER"),
-    new MessageButton()
-      .setCustomId("ticket-claim")
-      .setLabel("Claim")
-      .setEmoji("🖥️")
-      .setStyle("SUCCESS"),
-    new MessageButton()
-      .setCustomId("ticket-lock")
-      .setLabel("Lock")
+      .setLabel("Close Ticket")
       .setEmoji("🔒")
-      .setStyle("SUCCESS"),
-    new MessageButton()
-      .setCustomId("ticket-unlock")
-      .setLabel("Unlock")
-      .setEmoji("🔓")
-      .setStyle("SUCCESS")
+      .setStyle("DANGER")
   );
 
   await ticketChannel.send({
@@ -87,7 +71,7 @@ async function run(client, interaction) {
   });
 
   await interaction.followUp({
-    content: `Ticket has been successfully created <#${ticketChannel.id}>`,
+    content: `Your ticket has been created successfully: <#${ticketChannel.id}>`,
     ephemeral: true,
   });
 }

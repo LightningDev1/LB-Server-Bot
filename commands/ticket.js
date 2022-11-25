@@ -68,7 +68,7 @@ async function run(client, interaction) {
     const action = interaction.options.getString("action");
     const user = interaction.options.getUser("user");
 
-    const ticket = ticketDB.findOne({
+    const ticket = await ticketDB.findOne({
       GuildID: interaction.guild.id,
       ChannelID: interaction.channel.id,
     });
@@ -144,6 +144,84 @@ async function run(client, interaction) {
         interaction.channel.send(`${user} has been removed from this ticket`);
         ticket.save();
         break;
+
+      case "lock":
+        if (ticket.Locked) {
+          return interaction.followUp({
+            content: "This ticket is already locked",
+            ephemeral: true,
+          });
+        }
+
+        await ticketDB.updateOne(
+          { ChannelID: interaction.channel.id },
+          { Locked: true }
+        );
+
+        await interaction.channel.permissionOverwrites.edit(ticket.MemberID, {
+          SEND_MESSAGES: false,
+          VIEW_CHANNEL: false,
+        });
+
+        await interaction.reply({
+          embeds: [
+            new MessageEmbed()
+              .setTitle("Ticket Locked")
+              .setDescription("This ticket has been locked!")
+              .setColor("#0099ff"),
+          ],
+        });
+
+      case "unlock":
+        if (!ticket.Locked) {
+          return interaction.followUp({
+            content: "This ticket is already unlocked",
+            ephemeral: true,
+          });
+        }
+
+        await ticketDB.updateOne(
+          { ChannelID: interaction.channel.id },
+          { Locked: false }
+        );
+
+        await interaction.channel.permissionOverwrites.edit(ticket.MemberID, {
+          SEND_MESSAGES: true,
+          VIEW_CHANNEL: true,
+        });
+
+        await interaction.reply({
+          embeds: [
+            new MessageEmbed()
+              .setTitle("Ticket Unlocked")
+              .setDescription("This ticket has been unlocked!")
+              .setColor("#0099ff"),
+          ],
+        });
+
+      case "claim":
+        if (ticket.Claimed) {
+          return interaction.followUp({
+            content: "This ticket is already claimed",
+            ephemeral: true,
+          });
+        }
+
+        // Update the database entry
+        await ticketDB.updateOne(
+          { ChannelID: interaction.channel.id },
+          { Claimed: true }
+        );
+
+        await interaction.reply({
+          embeds: [
+            new MessageEmbed()
+              .setDescription(
+                `This ticket has been claimed by ${interaction.user}`
+              )
+              .setColor("#0099ff"),
+          ],
+        });
     }
   }
 }
@@ -177,7 +255,7 @@ export const command = {
         {
           name: "action",
           type: "STRING",
-          description: "Add or Remove a user from this ticket",
+          description: "The action you want to make",
           required: true,
           choices: [
             {
@@ -188,13 +266,25 @@ export const command = {
               name: "Remove",
               value: "remove",
             },
+            {
+              name: "Lock",
+              value: "lock",
+            },
+            {
+              name: "Unlock",
+              value: "unlock",
+            },
+            {
+              name: "Claim",
+              value: "claim",
+            },
           ],
         },
         {
           name: "user",
           type: "USER",
           description: "The user to add or remove",
-          required: true,
+          required: false,
         },
       ],
     },
