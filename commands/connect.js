@@ -62,7 +62,7 @@ async function run(client, interaction) {
   });
 
   // Add the verified role to the user
-  const role = getRole(interaction.guild, config.VERIFIED_USER_ROLE_ID);
+  const role = await getRole(interaction.guild, config.VERIFIED_USER_ROLE_ID);
 
   if (!role) {
     const embed = new MessageEmbed()
