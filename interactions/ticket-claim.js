@@ -4,7 +4,7 @@ import { isUserStaff } from "../utils/staff.js";
 
 async function run(client, interaction) {
   if (!isUserStaff(interaction.member)) {
-    return interaction.followUp({
+    return await interaction.followUp({
       content: "You must be an administrator to use this button",
       ephemeral: true,
     });
@@ -15,7 +15,7 @@ async function run(client, interaction) {
     .exec();
 
   if (!ticket) {
-    return interaction.followUp({
+    return await interaction.followUp({
       content:
         "No data was found related to this ticket, please remove it manually",
       ephemeral: true,
@@ -23,7 +23,7 @@ async function run(client, interaction) {
   }
 
   if (ticket.Claimed) {
-    return interaction.followUp({
+    return await interaction.followUp({
       content: "This ticket is already claimed",
       ephemeral: true,
     });

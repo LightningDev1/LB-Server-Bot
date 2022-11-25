@@ -8,7 +8,7 @@ async function run(client, interaction) {
   });
 
   if (!giveaway) {
-    return interaction.followUp({
+    return await interaction.followUp({
       content: "This giveaway has already ended!",
       ephemeral: true,
     });
@@ -17,14 +17,14 @@ async function run(client, interaction) {
   const currentEpoch = Math.floor(Date.now() / 1000);
 
   if (giveaway.EndEpoch < currentEpoch) {
-    return interaction.followUp({
+    return await interaction.followUp({
       content: "This giveaway has already ended!",
       ephemeral: true,
     });
   }
 
   if (giveaway.Entries.includes(interaction.user.id)) {
-    return interaction.followUp({
+    return await interaction.followUp({
       content: "You have already entered this giveaway!",
       ephemeral: true,
     });

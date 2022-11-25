@@ -11,7 +11,7 @@ async function run(client, interaction) {
   }
 
   if (!isUserStaff(interaction.member)) {
-    return interaction.reply({
+    return await interaction.reply({
       content: "You must be an administrator to use this command",
     });
   }
@@ -31,14 +31,14 @@ async function run(client, interaction) {
         )
         .setColor("GREEN");
 
-      return interaction.reply({ embeds: [embed], ephemeral });
+      return await interaction.reply({ embeds: [embed], ephemeral });
     } else {
       const embed = new MessageEmbed()
         .setTitle("Error")
         .setDescription(response.json.reason)
         .setColor("RED");
 
-      return interaction.reply({ embeds: [embed], ephemeral });
+      return await interaction.reply({ embeds: [embed], ephemeral });
     }
   } else if (subCommand == "check") {
     const ephemeral = interaction.options.get("method").value === "ephemeral";
@@ -59,14 +59,14 @@ async function run(client, interaction) {
         .addField("Redeemed By", keyData.redeemed_by.username)
         .setColor("GREEN");
 
-      return interaction.reply({ embeds: [embed], ephemeral });
+      return await interaction.reply({ embeds: [embed], ephemeral });
     } else {
       const embed = new MessageEmbed()
         .setTitle("Error")
         .setDescription(response.json.reason)
         .setColor("RED");
 
-      return interaction.reply({ embeds: [embed], ephemeral });
+      return await interaction.reply({ embeds: [embed], ephemeral });
     }
   }
 }

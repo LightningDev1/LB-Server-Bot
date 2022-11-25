@@ -4,7 +4,7 @@ client.on("interactionCreate", async (interaction) => {
   if (interaction.isCommand()) {
     // Slash Command Handling
     const cmd = client.slashCommands.get(interaction.commandName);
-    if (!cmd) return interaction.reply({ content: "An error has occurred" });
+    if (!cmd) return await interaction.reply({ content: "An error has occurred" });
 
     interaction.member = interaction.guild.members.cache.get(
       interaction.user.id

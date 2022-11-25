@@ -15,7 +15,7 @@ async function run(client, interaction) {
   }
 
   if (!isUserStaff(interaction.member)) {
-    return interaction.followUp({
+    return await interaction.followUp({
       content: "You must be an administrator to use this command",
     });
   }
@@ -35,14 +35,14 @@ async function run(client, interaction) {
       const endEpoch = (endDate.getTime() / 1000).toFixed();
 
       if (parsedDuration === 0) {
-        return interaction.reply({
+        return await interaction.reply({
           content: "That duration is invalid.",
           ephemeral: true,
         });
       }
 
       if (winners <= 0) {
-        return interaction.reply({
+        return await interaction.reply({
           content: "There must be at least 1 winner.",
           ephemeral: true,
         });

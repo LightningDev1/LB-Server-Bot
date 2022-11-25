@@ -12,7 +12,7 @@ async function run(client, interaction) {
   }
 
   if (!isUserStaff(interaction.member)) {
-    return interaction.followUp({
+    return await interaction.followUp({
       content: "You must be an administrator to use this command",
     });
   }
@@ -54,7 +54,7 @@ async function run(client, interaction) {
 
     ticketChannel.send({ embeds: [embed], components: [row] });
 
-    return interaction.reply({
+    return await interaction.reply({
       embeds: [
         new MessageEmbed()
           .setTitle("Ticket System")
@@ -74,7 +74,7 @@ async function run(client, interaction) {
     });
 
     if (!ticket) {
-      return interaction.reply({
+      return await interaction.reply({
         content: "This channel is not a ticket!",
         ephemeral: true,
       });
@@ -83,14 +83,14 @@ async function run(client, interaction) {
     switch (action) {
       case "add":
         if (interaction.user.id == user.id) {
-          return interaction.reply({
+          return await interaction.reply({
             content: "You can't add yourself to a ticket",
             ephemeral: true,
           });
         }
 
         if (ticket.Users.includes(user.id)) {
-          return interaction.reply({
+          return await interaction.reply({
             content: "This user is already in this ticket",
             ephemeral: true,
           });
@@ -116,14 +116,14 @@ async function run(client, interaction) {
 
       case "remove":
         if (interaction.user.id == user.id) {
-          return interaction.reply({
+          return await interaction.reply({
             content: "You can't remove yourself from a ticket",
             ephemeral: true,
           });
         }
 
         if (!ticket.Users.includes(user.id)) {
-          return interaction.reply({
+          return await interaction.reply({
             content: "This user is not in this ticket",
             ephemeral: true,
           });
@@ -147,7 +147,7 @@ async function run(client, interaction) {
 
       case "lock":
         if (ticket.Locked) {
-          return interaction.followUp({
+          return await interaction.followUp({
             content: "This ticket is already locked",
             ephemeral: true,
           });
@@ -174,7 +174,7 @@ async function run(client, interaction) {
 
       case "unlock":
         if (!ticket.Locked) {
-          return interaction.followUp({
+          return await interaction.followUp({
             content: "This ticket is already unlocked",
             ephemeral: true,
           });
@@ -201,7 +201,7 @@ async function run(client, interaction) {
 
       case "claim":
         if (ticket.Claimed) {
-          return interaction.followUp({
+          return await interaction.followUp({
             content: "This ticket is already claimed",
             ephemeral: true,
           });

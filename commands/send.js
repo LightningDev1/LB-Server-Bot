@@ -12,7 +12,7 @@ async function run(client, interaction) {
   }
 
   if (!isUserStaff(interaction.member)) {
-    return interaction.followUp({
+    return await interaction.followUp({
       content: "You must be an administrator to use this command",
     });
   }

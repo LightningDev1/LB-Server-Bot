@@ -14,7 +14,7 @@ async function run(client, interaction) {
       .setDescription(response.json.reason)
       .setColor("RED");
 
-    return interaction.reply({ embeds: [embed], ephemeral: true });
+    return await interaction.reply({ embeds: [embed], ephemeral: true });
   }
 
   const keyData = response.json.key;
@@ -26,7 +26,7 @@ async function run(client, interaction) {
       .setDescription("That key does not have an account associated with it!")
       .setColor("RED");
 
-    return interaction.reply({ embeds: [embed], ephemeral: true });
+    return await interaction.reply({ embeds: [embed], ephemeral: true });
   }
 
   // Check if the key already has an account connected
@@ -38,7 +38,7 @@ async function run(client, interaction) {
       .setDescription("That key is already connected to an account!")
       .setColor("RED");
 
-    return interaction.reply({ embeds: [embed], ephemeral: true });
+    return await interaction.reply({ embeds: [embed], ephemeral: true });
   }
 
   // Check if the user already has an account connected
@@ -52,7 +52,7 @@ async function run(client, interaction) {
       .setDescription("You already have an account connected!")
       .setColor("RED");
 
-    return interaction.reply({ embeds: [embed], ephemeral: true });
+    return await interaction.reply({ embeds: [embed], ephemeral: true });
   }
 
   await accountConnectionDB.create({
@@ -70,7 +70,7 @@ async function run(client, interaction) {
       .setDescription("The verified user role does not exist!")
       .setColor("RED");
 
-    return interaction.reply({ embeds: [embed], ephemeral: true });
+    return await interaction.reply({ embeds: [embed], ephemeral: true });
   }
 
   await interaction.member.roles.add(role);
