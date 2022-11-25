@@ -6,6 +6,7 @@ import {
 } from "discord.js";
 import { ticketDB } from "../models/ticket.js";
 import { config } from "../settings/config.js";
+import { getRole } from "../utils/roles.js";
 
 async function run(client, interaction) {
   const value = interaction.values[0];
