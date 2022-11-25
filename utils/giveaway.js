@@ -60,7 +60,7 @@ async function ensureTimeout(client, giveaway) {
           giveaway.EndEpoch,
           giveaway.HostID,
           giveaway.Entries.length,
-          giveaway.Winners.join(", "),
+          mentionWinners(winners),
           true
         )
       )
