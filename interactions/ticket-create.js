@@ -25,7 +25,7 @@ async function run(client, interaction) {
         },
         // Allow moderators to view the channel
         {
-          id: config.MOD_ROLE_ID,
+          id: interaction.guild.roles.cache.get(config.MOD_ROLE_ID),
           allow: ["SEND_MESSAGES", "VIEW_CHANNEL"],
         },
         // Deny everyone else from seeing the channel
