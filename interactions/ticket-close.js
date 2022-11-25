@@ -9,7 +9,7 @@ async function run(client, interaction) {
     .exec();
 
   if (!ticket) {
-    return interaction.followUp({
+    return await interaction.followUp({
       content:
         "No data was found related to this ticket, please remove it manually",
       ephemeral: true,
@@ -17,7 +17,7 @@ async function run(client, interaction) {
   }
 
   if (ticket.Closed) {
-    return interaction.followUp({
+    return await interaction.followUp({
       content: "This ticket is already closed!",
       ephemeral: true,
     });
@@ -45,23 +45,24 @@ async function run(client, interaction) {
       embeds: [
         new MessageEmbed()
           .setTitle("Ticket Closed - Transcript")
-          .setDescription(
-            `${interaction.user.tag} has closed a ticket\nTicket User: ${member.user.tag}\nTicket Type: ${ticket.Type}\nTicketID: ${ticket.TicketID}`
-          )
+          .setDescription("A ticket has been closed.")
+          .addField("Ticket User", member.user.tag)
+          .addField("Closed By", interaction.user.tag)
+          .addField("Ticket ID", ticket.TicketID)
           .setColor("#0099ff"),
       ],
       files: [transcriptAttachment],
     });
 
   // Send the transcript to the user
-  member
+  await member
     .send({
       embeds: [
         new MessageEmbed()
           .setTitle("Ticket Closed - Transcript")
-          .setDescription(
-            `Your ticket has been closed\n\nTicket Type: ${ticket.Type}\nTicket ticketID: ${ticket.TicketID}`
-          )
+          .setDescription("Your ticket has been closed. You can view the transcript by downloading the file.")
+          .addField("Ticket Type", ticket.Type)
+          .addField("Ticket ID", ticket.TicketID)
           .setColor("#0099ff"),
       ],
       files: [transcriptAttachment],
@@ -69,12 +70,12 @@ async function run(client, interaction) {
     // Catch errors if the user has DMs disabled
     .catch(() => {});
 
-  interaction.followUp({
+  await interaction.followUp({
     embeds: [
       new MessageEmbed()
         .setTitle("Ticket Closed")
         .setDescription(
-          `This ticket is being closed, [here is the transcript](${message.url})`
+          `This ticket is being closed, [here is the transcript](${message.url}).`
         )
         .setColor("#0099ff"),
     ],
@@ -82,7 +83,7 @@ async function run(client, interaction) {
 
   // Delete the channel and ticket after 10 seconds
   setTimeout(() => {
-    interaction.channel.delete();
+    await interaction.channel.delete();
     ticketDB.deleteOne({ ChannelID: interaction.channel.id }, (err) => {
       if (err) throw err;
     });
