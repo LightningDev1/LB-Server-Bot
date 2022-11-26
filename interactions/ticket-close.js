@@ -23,17 +23,24 @@ async function run(client, interaction) {
     });
   }
 
-  const transcriptAttachment = await createTranscript(interaction.channel, {
-    returnType: "attachment",
-    fileName: `${interaction.channel.name}.html`,
-    minify: true,
-  });
-
   // Update the database entry
   await ticketDB.updateOne(
     { ChannelID: interaction.channel.id },
     { Closed: true }
   );
+
+  const transcriptString = await createTranscript(interaction.channel, {
+    returnType: "string",
+    minify: true,
+  });
+
+  const result = await client.apiWrapper.CreateTranscript(transcriptString);
+
+  let transcriptUrl = "**An error occurred while uploading the transcript**";
+  if (result.success) {
+    transcriptUrl = "https://transcripts.lightning-bot.com/" + result.data.code;
+  }
+
 
   // Get the user who opened the ticket
   const member = interaction.guild.members.cache.get(ticket.MemberID);
@@ -44,14 +51,14 @@ async function run(client, interaction) {
     .send({
       embeds: [
         new MessageEmbed()
-          .setTitle("Ticket Closed - Transcript")
+          .setTitle("Ticket Closed")
           .setDescription("A ticket has been closed.")
           .addField("Ticket User", member.user.tag)
           .addField("Closed By", interaction.user.tag)
           .addField("Ticket ID", ticket.TicketID)
+          .addField("Transcript", transcriptUrl)
           .setColor("#0099ff"),
       ],
-      files: [transcriptAttachment],
     });
 
   // Send the transcript to the user
@@ -59,10 +66,11 @@ async function run(client, interaction) {
     .send({
       embeds: [
         new MessageEmbed()
-          .setTitle("Ticket Closed - Transcript")
-          .setDescription("Your ticket has been closed. You can view the transcript by downloading the file.")
+          .setTitle("Ticket Closed")
+          .setDescription("Your ticket has been closed. You can view the transcript by opening the below URL.")
           .addField("Ticket Type", ticket.Type)
           .addField("Ticket ID", ticket.TicketID)
+          .addField("Transcript", transcriptUrl)
           .setColor("#0099ff"),
       ],
       files: [transcriptAttachment],
@@ -75,7 +83,7 @@ async function run(client, interaction) {
       new MessageEmbed()
         .setTitle("Ticket Closed")
         .setDescription(
-          `This ticket is being closed, [here is the transcript](${message.url}).`
+          `This ticket is being closed, [here is the transcript](${transcriptUrl}).`
         )
         .setColor("#0099ff"),
     ],
