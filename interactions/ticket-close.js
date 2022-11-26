@@ -38,7 +38,7 @@ async function run(client, interaction) {
 
   let transcriptUrl = "**An error occurred while uploading the transcript**";
   if (result.success) {
-    transcriptUrl = "https://transcripts.lightning-bot.com/" + result.data.code;
+    transcriptUrl = "https://transcripts.lightning-bot.com/" + result.json.code;
   }
 
 
@@ -73,7 +73,6 @@ async function run(client, interaction) {
           .addField("Transcript", transcriptUrl)
           .setColor("#0099ff"),
       ],
-      files: [transcriptAttachment],
     })
     // Catch errors if the user has DMs disabled
     .catch(() => {});
