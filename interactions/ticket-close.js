@@ -38,15 +38,15 @@ async function run(client, interaction) {
 
   let transcriptUrl = "**An error occurred while uploading the transcript**";
   if (result.success) {
-    transcriptUrl = "https://transcripts.lightning-bot.com/t/" + result.json.code;
+    transcriptUrl =
+      "https://transcripts.lightning-bot.com/t/" + result.json.code;
   }
-
 
   // Get the user who opened the ticket
   const member = interaction.guild.members.cache.get(ticket.MemberID);
 
   // Send the transcript to the log channel
-  const message = await interaction.guild.channels.cache
+  await interaction.guild.channels.cache
     .get(config.TICKET.TRANSCRIPT_CHANNEL_ID)
     .send({
       embeds: [
@@ -67,7 +67,9 @@ async function run(client, interaction) {
       embeds: [
         new MessageEmbed()
           .setTitle("Ticket Closed")
-          .setDescription("Your ticket has been closed. You can view the transcript by opening the below URL.")
+          .setDescription(
+            "Your ticket has been closed. You can view the transcript by opening the below URL."
+          )
           .addField("Ticket Type", ticket.Type)
           .addField("Ticket ID", ticket.TicketID)
           .addField("Transcript", transcriptUrl)
