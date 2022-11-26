@@ -14,6 +14,12 @@ class ApiWrapper {
   async CheckKey(key) {
     return await this.http.Get(`/api/v3/discord-bot/check-key?key=${key}`);
   }
+
+  async CreateTranscript(html) {
+    return await this.http.Post("/api/v3/discord-bot/create-transcript", {
+      html,
+    });
+  }
 }
 
 export { ApiWrapper };
