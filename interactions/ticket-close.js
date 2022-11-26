@@ -38,7 +38,7 @@ async function run(client, interaction) {
 
   let transcriptUrl = "**An error occurred while uploading the transcript**";
   if (result.success) {
-    transcriptUrl = "https://transcripts.lightning-bot.com/" + result.json.code;
+    transcriptUrl = "https://transcripts.lightning-bot.com/t/" + result.json.code;
   }
 
 
