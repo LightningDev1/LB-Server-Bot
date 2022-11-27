@@ -12,8 +12,8 @@ client.on("messageCreate", async (message) => {
 
     const embed = new MessageEmbed()
       .setTitle("Uptime Alert")
-      .setDescription("A monitor has changed status.")
-      .addField("Status", uptimeAlert.status)
+      .setDescription("https://lightning-bot.com has changed status")
+      .addField("New Status", uptimeAlert.status)
       .setColor("#0099ff");
 
     if (uptimeAlert.status === "DOWN") {
