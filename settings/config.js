@@ -25,6 +25,11 @@ const sharedConfig = {
     "Do not send any harmful content (e.g. token loggers, IP loggers, malware)",
     "Listen to staff and follow their instructions",
   ],
+
+  UPTIME_ALERTS: {
+    SOURCE_CHANNEL_ID: "1046353251597025290",
+    TARGET_CHANNEL_ID: "899567496934346752",
+  }
 };
 
 const debugConfig = {
