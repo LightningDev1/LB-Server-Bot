@@ -23,7 +23,7 @@ client.on("messageCreate", async (message) => {
     }
 
     await client.channels.cache
-      .get(config.UPTIME_ALERTS.DESTINATION_CHANNEL_ID)
+      .get(config.UPTIME_ALERTS.TARGET_CHANNEL_ID)
       .send({ embeds: [embed] });
 
     await message.delete();
