@@ -22,4 +22,10 @@ client.on("guildMemberAdd", async (member) => {
     embeds: [embed],
     files: [attachment],
   });
+
+  // Add member role to user
+  const memberRole = member.guild.roles.cache.get(config.MEMBER_ROLE_ID);
+  if (!memberRole) return;
+
+  await member.roles.add(memberRole);
 });
