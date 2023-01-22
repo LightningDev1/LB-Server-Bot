@@ -12,7 +12,7 @@ client.on("ready", async () => {
     client.user.setActivity(config.ACTIVITIES[currentActivity]);
 
     currentActivity = (currentActivity + 1) % config.ACTIVITIES.length;
-  }, 10000);
+  }, 15000);
 
   const giveaways = await giveawayDB.find({});
 
