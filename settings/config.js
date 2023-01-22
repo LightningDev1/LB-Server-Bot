@@ -9,10 +9,24 @@ const sharedConfig = {
   MONGO_URI: process.env.MONGO_URI,
   API_URL: "https://api.lightning-bot.com",
 
-  STATUS: {
-    TEXT: "Tickets",
-    TYPE: "WATCHING",
-  },
+  ACTIVITIES: [
+    {
+      TEXT: "LightningBot",
+      TYPE: "PLAYING",
+    },
+    {
+      TEXT: "lightning-bot.com",
+      TYPE: "WATCHING",
+    },
+    {
+      TEXT: "Tickets",
+      TYPE: "WATCHING",
+    },
+    {
+      TEXT: "Giveaways",
+      TYPE: "WATCHING",
+    },
+  ]
 
   RULES: [
     "No Spamming",

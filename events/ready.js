@@ -6,10 +6,13 @@ import { client } from "../index.js";
 client.on("ready", async () => {
   console.log(`\x1b[32m[+] \x1b[0mLightningBot is online`);
 
-  client.user.setActivity({
-    type: config.STATUS.TYPE,
-    name: config.STATUS.TEXT,
-  });
+  let currentActivity = 0;
+
+  setInterval(() => {
+    client.user.setActivity(config.ACTIVITIES[currentActivity]);
+
+    currentActivity = (currentActivity + 1) % config.ACTIVITIES.length;
+  }, 10000);
 
   const giveaways = await giveawayDB.find({});
 

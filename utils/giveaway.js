@@ -1,13 +1,9 @@
 import { MessageEmbed } from "discord.js";
 import { giveawayDB } from "../models/giveaway.js";
 
-function generateDescription(
-  endEpoch,
-  hostID,
-  entries,
-  winners,
-  ended = false
-) {
+function generateDescription(data) {
+  const { endEpoch, hostID, entries, winners, ended = false } = data;
+
   return (
     `End${ended ? "ed" : "s"}: <t:${endEpoch}:R> (<t:${endEpoch}>)` +
     `\nHosted by: <@${hostID}>` +
@@ -30,34 +26,25 @@ async function endGiveaway(client, messageId) {
   const channel = client.channels.cache.get(giveaway.ChannelID);
   const message = await channel.messages.fetch(giveaway.MessageID);
 
-  const winners = [];
+  // Select the winners
+  const filter = (entry) => !winners.includes(entry);
+  const nonWinners = giveaway.Entries.filter(filter);
 
-  while (winners.length < giveaway.WinnerAmount) {
-    const winner =
-      giveaway.Entries[Math.floor(Math.random() * giveaway.Entries.length)];
+  const shuffledEntries = nonWinners.sort(() => 0.5 - Math.random());
 
-    if (!winners.includes(winner)) {
-      winners.push(winner);
-    }
+  giveaway.Winners = shuffledEntries.slice(0, giveaway.WinnerAmount);
 
-    if (winners.length === giveaway.Entries.length) {
-      break;
-    }
-  }
-
-  giveaway.Winners = winners;
+  const description = generateDescription({
+    endEpoch: giveaway.EndEpoch,
+    hostID: giveaway.HostID,
+    entries: giveaway.Entries.length,
+    winners: mentionWinners(giveaway.Winners),
+    ended: true,
+  });
 
   const embed = new MessageEmbed()
     .setTitle(`**${giveaway.Prize}**`)
-    .setDescription(
-      generateDescription(
-        giveaway.EndEpoch,
-        giveaway.HostID,
-        giveaway.Entries.length,
-        mentionWinners(winners),
-        true
-      )
-    )
+    .setDescription(description)
     .setTimestamp(giveaway.EndEpoch * 1000)
     .setColor("#378cbc");
 
@@ -111,41 +98,29 @@ async function rerollGiveaway(client, interaction, messageId) {
     });
   }
 
-  const winners = [];
-
   // Max 1 winner for reroll
-  while (winners.length < 1) {
-    const winner =
-      giveaway.Entries[Math.floor(Math.random() * giveaway.Entries.length)];
+  const winnerIndex = Math.floor(Math.random() * array.length);
+  const winner = giveaway.Winners[winnerIndex];
 
-    if (!winners.includes(winner)) {
-      winners.push(winner);
-    }
+  giveaway.Winners = [winner];
 
-    if (winners.length === 1) {
-      break;
-    }
-  }
-
-  giveaway.Winners = winners;
+  const description = generateDescription({
+    endEpoch: giveaway.EndEpoch,
+    hostID: giveaway.HostID,
+    entries: giveaway.Entries.length,
+    winners: mentionWinners(giveaway.Winners),
+    ended: true,
+  });
 
   const embed = new MessageEmbed()
     .setTitle(`**${giveaway.Prize}**`)
-    .setDescription(
-      generateDescription(
-        giveaway.EndEpoch,
-        giveaway.HostID,
-        giveaway.Entries.length,
-        mentionWinners(winners),
-        true
-      )
-    )
+    .setDescription(description)
     .setTimestamp(giveaway.EndEpoch * 1000)
     .setColor("#378cbc");
 
   const channel = client.channels.cache.get(giveaway.ChannelID);
   const message = await channel.messages.fetch(giveaway.MessageID);
-  
+
   await message.edit({ embeds: [embed] });
 
   await message.reply({
@@ -157,4 +132,10 @@ async function rerollGiveaway(client, interaction, messageId) {
   await giveaway.save();
 }
 
-export { generateDescription, mentionWinners, endGiveaway, rerollGiveaway, ensureTimeout };
+export {
+  generateDescription,
+  mentionWinners,
+  endGiveaway,
+  rerollGiveaway,
+  ensureTimeout,
+};
