@@ -26,7 +26,7 @@ const sharedConfig = {
       TEXT: "Giveaways",
       TYPE: "WATCHING",
     },
-  ]
+  ],
 
   RULES: [
     "No Spamming",
