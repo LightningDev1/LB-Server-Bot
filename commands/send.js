@@ -2,7 +2,7 @@ import { MessageEmbed } from "discord.js";
 import { config } from "../settings/config.js";
 import { isUserStaff } from "../utils/staff.js";
 
-const subCommands = ["rules", "bugreports", "suggestions"];
+const subCommands = ["rules", "bugreports", "suggestions", "faq"];
 
 async function run(client, interaction) {
   const subCommand = interaction.options.getSubcommand();
