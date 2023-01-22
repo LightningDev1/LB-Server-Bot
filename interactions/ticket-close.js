@@ -46,57 +46,54 @@ async function run(client, interaction) {
   const member = interaction.guild.members.cache.get(ticket.MemberID);
 
   // Send the transcript to the log channel
+  const logEmbed = new MessageEmbed()
+    .setTitle("Ticket Closed")
+    .setDescription("A ticket has been closed.")
+    .addField("Ticket User", member.user.tag)
+    .addField("Closed By", interaction.user.tag)
+    .addField("Ticket ID", ticket.TicketID)
+    .addField("Transcript", transcriptUrl)
+    .setColor("#0099ff");
+
   await interaction.guild.channels.cache
     .get(config.TICKET.TRANSCRIPT_CHANNEL_ID)
-    .send({
-      embeds: [
-        new MessageEmbed()
-          .setTitle("Ticket Closed")
-          .setDescription("A ticket has been closed.")
-          .addField("Ticket User", member.user.tag)
-          .addField("Closed By", interaction.user.tag)
-          .addField("Ticket ID", ticket.TicketID)
-          .addField("Transcript", transcriptUrl)
-          .setColor("#0099ff"),
-      ],
-    });
+    .send({ embeds: [logEmbed] });
 
   // Send the transcript to the user
+  const dmEmbed = new MessageEmbed()
+    .setTitle("Ticket Closed")
+    .setDescription(
+      "Your ticket has been closed. You can view the transcript by opening the below URL."
+    )
+    .addField("Ticket Type", ticket.Type)
+    .addField("Ticket ID", ticket.TicketID)
+    .addField("Transcript", transcriptUrl)
+    .setColor("#0099ff");
+
   await member
-    .send({
-      embeds: [
-        new MessageEmbed()
-          .setTitle("Ticket Closed")
-          .setDescription(
-            "Your ticket has been closed. You can view the transcript by opening the below URL."
-          )
-          .addField("Ticket Type", ticket.Type)
-          .addField("Ticket ID", ticket.TicketID)
-          .addField("Transcript", transcriptUrl)
-          .setColor("#0099ff"),
-      ],
-    })
+    .send({ embeds: [dmEmbed] })
     // Catch errors if the user has DMs disabled
     .catch(() => {});
 
-  await interaction.followUp({
-    embeds: [
-      new MessageEmbed()
-        .setTitle("Ticket Closed")
-        .setDescription(
-          `This ticket is being closed, [here is the transcript](${transcriptUrl}).`
-        )
-        .setColor("#0099ff"),
-    ],
-  });
+  // Reply to the interaction
+
+  const followUpEmbed = new MessageEmbed()
+    .setTitle("Ticket Closed")
+    .setDescription(
+      `This ticket is being closed, [here is the transcript](${transcriptUrl}).`
+    )
+    .setColor("#0099ff");
+
+  await interaction.followUp({ embeds: [followUpEmbed] });
 
   // Delete the channel and ticket after 10 seconds
+
   setTimeout(async () => {
     await interaction.channel.delete();
     ticketDB.deleteOne({ ChannelID: interaction.channel.id }, (err) => {
       if (err) throw err;
     });
-  }, 10 * 1000);
+  }, 10000);
 }
 
 export const interaction = {

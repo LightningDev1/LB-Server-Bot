@@ -13,7 +13,7 @@ async function run(client, interaction) {
       ephemeral: true,
     });
   }
-  
+
   const currentEpoch = Math.floor(Date.now() / 1000);
 
   if (giveaway.EndEpoch < currentEpoch) {
@@ -43,16 +43,16 @@ async function run(client, interaction) {
     .get(giveaway.ChannelID)
     .messages.fetch(giveaway.MessageID);
 
+  const description = generateDescription({
+    endEpoch: giveaway.EndEpoch,
+    hostID: giveaway.HostID,
+    entries: giveaway.Entries.length,
+    winners: giveaway.WinnerAmount,
+  });
+
   const embed = new MessageEmbed()
     .setTitle(`**${giveaway.Prize}**`)
-    .setDescription(
-      generateDescription(
-        giveaway.EndEpoch,
-        giveaway.HostID,
-        giveaway.Entries.length,
-        giveaway.WinnerAmount
-      )
-    )
+    .setDescription(description)
     .setTimestamp(giveaway.EndEpoch * 1000)
     .setColor("#378cbc");
 

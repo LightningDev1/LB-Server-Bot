@@ -35,13 +35,11 @@ async function run(client, interaction) {
     { Claimed: true }
   );
 
-  interaction.channel.send({
-    embeds: [
-      new MessageEmbed()
-        .setDescription(`This ticket has been claimed by ${interaction.user}`)
-        .setColor("#0099ff"),
-    ],
-  });
+  const embed = new MessageEmbed()
+    .setDescription(`This ticket has been claimed by ${interaction.user}`)
+    .setColor("#0099ff");
+
+  interaction.channel.send({ embeds: [embed] });
 }
 
 export const interaction = {

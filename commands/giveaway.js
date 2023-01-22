@@ -32,11 +32,6 @@ async function run(client, interaction) {
 
     const parsedDuration = parseDuration(duration);
 
-    let endDate = new Date();
-    endDate = new Date(endDate.getTime() + parsedDuration * 1000);
-
-    const endEpoch = (endDate.getTime() / 1000).toFixed();
-
     if (parsedDuration === 0) {
       return await interaction.reply({
         content: "That duration is invalid.",
@@ -51,11 +46,20 @@ async function run(client, interaction) {
       });
     }
 
+    const endDate = new Date(Date.now() + parsedDuration * 1000);
+
+    const endEpoch = Math.floor(endDate.getTime() / 1000);
+
+    const description = generateDescription({
+      endEpoch: endEpoch,
+      hostID: interaction.user.id,
+      entries: 0,
+      winners: winners,
+    });
+
     const embed = new MessageEmbed()
       .setTitle(`**${prize}**`)
-      .setDescription(
-        generateDescription(endEpoch, interaction.user.id, 0, winners)
-      )
+      .setDescription(description)
       .setTimestamp(endDate)
       .setColor("#378cbc");
 

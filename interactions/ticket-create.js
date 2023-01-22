@@ -13,28 +13,30 @@ async function run(client, interaction) {
   const ticketID = Math.floor(Math.random() * 90000) + 10000;
 
   // Create the ticket channel
+  const permissionOverwrites = [
+    // Allow the ticket user to view the channel
+    {
+      id: interaction.member.id,
+      allow: ["SEND_MESSAGES", "VIEW_CHANNEL"],
+    },
+    // Allow moderators to view the channel
+    {
+      id: config.MOD_ROLE_ID,
+      allow: ["SEND_MESSAGES", "VIEW_CHANNEL"],
+    },
+    // Deny everyone else from seeing the channel
+    {
+      id: interaction.guild.id,
+      deny: ["SEND_MESSAGES", "VIEW_CHANNEL"],
+    },
+  ];
+
   const ticketChannel = await interaction.guild.channels.create(
     `${value}-${interaction.user.username}-${ticketID}`,
     {
       type: "GUILD_TEXT",
       parent: config.TICKET.CATEGORY_ID,
-      permissionOverwrites: [
-        // Allow the ticket user to view the channel
-        {
-          id: interaction.member.id,
-          allow: ["SEND_MESSAGES", "VIEW_CHANNEL"],
-        },
-        // Allow moderators to view the channel
-        {
-          id: config.MOD_ROLE_ID,
-          allow: ["SEND_MESSAGES", "VIEW_CHANNEL"],
-        },
-        // Deny everyone else from seeing the channel
-        {
-          id: interaction.guild.id,
-          deny: ["SEND_MESSAGES", "VIEW_CHANNEL"],
-        },
-      ],
+      permissionOverwrites: permissionOverwrites,
     }
   );
 
