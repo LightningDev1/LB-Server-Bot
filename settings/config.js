@@ -11,20 +11,20 @@ const sharedConfig = {
 
   ACTIVITIES: [
     {
-      TEXT: "LightningBot",
-      TYPE: "PLAYING",
+      name: "LightningBot",
+      type: "PLAYING",
     },
     {
-      TEXT: "lightning-bot.com",
-      TYPE: "WATCHING",
+      name: "lightning-bot.com",
+      type: "WATCHING",
     },
     {
-      TEXT: "Tickets",
-      TYPE: "WATCHING",
+      name: "Tickets",
+      type: "WATCHING",
     },
     {
-      TEXT: "Giveaways",
-      TYPE: "WATCHING",
+      name: "Giveaways",
+      type: "WATCHING",
     },
   ],
 
