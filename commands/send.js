@@ -4,7 +4,7 @@ import { isUserStaff } from "../utils/staff.js";
 
 const subCommands = ["rules", "bugreports", "suggestions", "faq"];
 
-async function run(client, interaction) {
+async function run(_client, interaction) {
   const subCommand = interaction.options.getSubcommand();
 
   if (!subCommands.includes(subCommand)) {
@@ -68,9 +68,9 @@ async function run(client, interaction) {
     }
   }
 
-  channel.send({ embeds: [embed] });
+  await channel.send({ embeds: [embed] });
 
-  interaction.reply({ content: "Done!", ephemeral: true });
+  await interaction.reply({ content: "Done!", ephemeral: true });
 }
 
 export const command = {

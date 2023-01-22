@@ -12,4 +12,16 @@ function parseUptimeAlert(content) {
   return parsedAlert;
 }
 
-export { parseUptimeAlert };
+function getStatusColor(status) {
+  switch (status) {
+    case "UP":
+      // Lime Green
+      return "#32CD32";
+
+    case "DOWN":
+      // Crimson
+      return "#DC143C";
+  }
+}
+
+export { parseUptimeAlert, getStatusColor };
