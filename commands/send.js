@@ -22,7 +22,7 @@ async function run(client, interaction) {
   const embed = new MessageEmbed();
 
   switch (subCommand) {
-    case "rules":
+    case "rules": {
       embed
         .setTitle("LightningBot Rules")
         .setDescription(
@@ -33,30 +33,30 @@ async function run(client, interaction) {
       for (let i = 0; i < config.RULES.length; i++) {
         embed.addField(`Rule ${i + 1}`, config.RULES[i]);
       }
-
-      channel.send({ embeds: [embed] });
       break;
-    case "bugreports":
+    }
+
+    case "bugreports": {
       embed
         .setTitle("Bug Reports")
         .setDescription(
           "If you find a bug in LightningBot, you can report it here. Please make sure to provide as much information as possible."
         )
         .setColor("#378cbc");
-
-      channel.send({ embeds: [embed] });
       break;
-    case "suggestions":
+    }
+
+    case "suggestions": {
       embed
         .setTitle("Suggestions")
         .setDescription(
           "Have an idea you would like to see implemented in LightningBot? Post it here! We will do our best to add all suggestions."
         )
         .setColor("#378cbc");
-
-      channel.send({ embeds: [embed] });
       break;
-    case "faq":
+    }
+
+    case "faq": {
       embed
         .setTitle("Frequently Asked Questions")
         .setDescription(
@@ -64,10 +64,11 @@ async function run(client, interaction) {
             " If not, create a ticket or ask it in the support channel. We will try to answer as soon as possible."
         )
         .setColor("#378cbc");
-
-      channel.send({ embeds: [embed] });
       break;
+    }
   }
+
+  channel.send({ embeds: [embed] });
 
   interaction.reply({ content: "Done!", ephemeral: true });
 }
