@@ -1,9 +1,11 @@
 async function getRole(guild, roleId) {
-  let role = guild.roles.cache.get(roleId);
-  if (!role) {
-    role = await guild.roles.fetch(roleId);
+  const role = guild.roles.cache.get(roleId);
+
+  if (role) {
+    return role;
   }
-  return role;
+
+  return await guild.roles.fetch(roleId);
 }
 
 export { getRole };
