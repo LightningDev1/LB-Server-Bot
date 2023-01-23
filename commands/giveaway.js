@@ -24,124 +24,138 @@ async function run(client, interaction) {
     });
   }
 
-  if (subCommand === "create") {
-    const channel = interaction.options.getChannel("channel");
-    const duration = interaction.options.getString("duration");
-    const winners = interaction.options.getInteger("winners");
-    const prize = interaction.options.getString("prize");
+  switch (subCommand) {
+    case "create": {
+      const channel = interaction.options.getChannel("channel");
+      const duration = interaction.options.getString("duration");
+      const winners = interaction.options.getInteger("winners");
+      const prize = interaction.options.getString("prize");
 
-    const parsedDuration = parseDuration(duration);
+      const parsedDuration = parseDuration(duration);
 
-    if (parsedDuration === 0) {
-      return await interaction.reply({
-        content: "That duration is invalid.",
-        ephemeral: true,
+      if (parsedDuration === 0) {
+        return await interaction.reply({
+          content: "That duration is invalid.",
+          ephemeral: true,
+        });
+      }
+
+      if (winners <= 0) {
+        return await interaction.reply({
+          content: "There must be at least 1 winner.",
+          ephemeral: true,
+        });
+      }
+
+      const endDate = new Date(Date.now() + parsedDuration * 1000);
+
+      const endEpoch = Math.floor(endDate.getTime() / 1000);
+
+      const description = generateDescription({
+        endEpoch: endEpoch,
+        hostID: interaction.user.id,
+        entries: 0,
+        winners: winners,
       });
-    }
 
-    if (winners <= 0) {
-      return await interaction.reply({
-        content: "There must be at least 1 winner.",
-        ephemeral: true,
-      });
-    }
+      const embed = new MessageEmbed()
+        .setTitle(`**${prize}**`)
+        .setDescription(description)
+        .setTimestamp(endDate)
+        .setColor("#378cbc");
 
-    const endDate = new Date(Date.now() + parsedDuration * 1000);
-
-    const endEpoch = Math.floor(endDate.getTime() / 1000);
-
-    const description = generateDescription({
-      endEpoch: endEpoch,
-      hostID: interaction.user.id,
-      entries: 0,
-      winners: winners,
-    });
-
-    const embed = new MessageEmbed()
-      .setTitle(`**${prize}**`)
-      .setDescription(description)
-      .setTimestamp(endDate)
-      .setColor("#378cbc");
-
-    const actionRow = new MessageActionRow().addComponents(
-      new MessageButton()
-        .setCustomId("giveaway-enter")
-        .setStyle("PRIMARY")
-        .setLabel("Enter")
-        .setEmoji("🎉")
-    );
-
-    const message = await channel.send({
-      embeds: [embed],
-      components: [actionRow],
-    });
-
-    const giveaway = await giveawayDB.create({
-      GuildID: interaction.guild.id,
-      ChannelID: channel.id,
-      MessageID: message.id,
-      HostID: interaction.user.id,
-      EndEpoch: endEpoch,
-      Entries: [],
-      Prize: prize,
-      WinnerAmount: winners,
-      Winners: [],
-      EndTimeout: -1,
-    });
-
-    await ensureTimeout(client, giveaway);
-  } else if (subCommand === "delete") {
-    const messageId = interaction.options.getString("giveaway_id");
-
-    const giveaway = await giveawayDB.findOne({
-      MessageID: messageId,
-    });
-
-    if (!giveaway) {
-      return await interaction.reply({
-        content: "That giveaway does not exist.",
-        ephemeral: true,
-      });
-    }
-  } else if (subCommand === "end") {
-    const messageId = interaction.options.getString("giveaway_id");
-    await endGiveaway(client, messageId);
-  } else if (subCommand === "reroll") {
-    const messageId = interaction.options.getString("giveaway_id");
-    await rerollGiveaway(client, interaction, messageId);
-  } else if (subCommand === "list") {
-    const giveaways = await giveawayDB.find({
-      GuildID: interaction.guild.id,
-    });
-
-    if (giveaways.length === 0) {
-      return await interaction.reply({
-        content: "There are no giveaways in this server.",
-        ephemeral: true,
-      });
-    }
-
-    const embed = new MessageEmbed().setTitle("Giveaways").setColor("#378cbc");
-
-    for (const giveaway of giveaways) {
-      const guild = client.guilds.cache.get(giveaway.GuildID);
-      const channel = guild.channels.cache.get(giveaway.ChannelID);
-      const message = await channel.messages.fetch(giveaway.MessageID);
-
-      const prize = message.embeds[0].title;
-      const ended = giveaway.EndEpoch < (Date.now() / 1000).toFixed();
-      const endedString = ended ? "Ended" : "Active";
-
-      embed.addField(
-        `${prize} (${endedString})`,
-        `Winners: ${giveaway.WinnerAmount}`
+      const actionRow = new MessageActionRow().addComponents(
+        new MessageButton()
+          .setCustomId("giveaway-enter")
+          .setStyle("PRIMARY")
+          .setLabel("Enter")
+          .setEmoji("🎉")
       );
+
+      const message = await channel.send({
+        embeds: [embed],
+        components: [actionRow],
+      });
+
+      const giveaway = await giveawayDB.create({
+        GuildID: interaction.guild.id,
+        ChannelID: channel.id,
+        MessageID: message.id,
+        HostID: interaction.user.id,
+        EndEpoch: endEpoch,
+        Entries: [],
+        Prize: prize,
+        WinnerAmount: winners,
+        Winners: [],
+        EndTimeout: -1,
+      });
+
+      await ensureTimeout(client, giveaway);
     }
 
-    await interaction.reply({
-      embeds: [embed],
-      ephemeral: true,
-    });
+    case "delete": {
+      const messageId = interaction.options.getString("giveaway_id");
+
+      const giveaway = await giveawayDB.findOne({
+        MessageID: messageId,
+      });
+
+      if (!giveaway) {
+        return await interaction.reply({
+          content: "That giveaway does not exist.",
+          ephemeral: true,
+        });
+      }
+    }
+
+    case "end": {
+      const messageId = interaction.options.getString("giveaway_id");
+
+      await endGiveaway(client, messageId);
+    }
+
+    case "reroll": {
+      const messageId = interaction.options.getString("giveaway_id");
+      
+      await rerollGiveaway(client, interaction, messageId);
+    }
+
+    case "list": {
+      const giveaways = await giveawayDB.find({
+        GuildID: interaction.guild.id,
+      });
+
+      if (giveaways.length === 0) {
+        return await interaction.reply({
+          content: "There are no giveaways in this server.",
+          ephemeral: true,
+        });
+      }
+
+      const embed = new MessageEmbed()
+        .setTitle("Giveaways")
+        .setColor("#378cbc");
+
+      for (const giveaway of giveaways) {
+        const guild = client.guilds.cache.get(giveaway.GuildID);
+        const channel = guild.channels.cache.get(giveaway.ChannelID);
+        const message = await channel.messages.fetch(giveaway.MessageID);
+
+        const prize = message.embeds[0].title;
+        const ended = giveaway.EndEpoch < (Date.now() / 1000).toFixed();
+        const endedString = ended ? "Ended" : "Active";
+
+        embed.addField(
+          `${prize} (${endedString})`,
+          `Winners: ${giveaway.WinnerAmount}`
+        );
+      }
+
+      await interaction.reply({
+        embeds: [embed],
+        ephemeral: true,
+      });
+    }
   }
 
   if (subCommand !== "list") {
