@@ -13,8 +13,6 @@ const giveawaySchema = new mongoose.Schema({
   EndTimeout: Number
 });
 
-clearTimeout
-
 const giveawayDB = mongoose.model("giveaway", giveawaySchema);
 
 export { giveawayDB };
