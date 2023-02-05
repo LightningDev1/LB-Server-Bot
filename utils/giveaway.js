@@ -27,7 +27,7 @@ async function endGiveaway(client, messageId) {
   const message = await channel.messages.fetch(giveaway.MessageID);
 
   // Select the winners
-  const filter = (entry) => !winners.includes(entry);
+  const filter = (entry) => !giveaway.Winners.includes(entry);
   const nonWinners = giveaway.Entries.filter(filter);
 
   const shuffledEntries = nonWinners.sort(() => 0.5 - Math.random());
